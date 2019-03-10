@@ -141,6 +141,62 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
     $players_team1[] = $row_player;
 }
 
+//team 1 players OSNOVA
+$sql = <<<EOF
+SELECT
+t1.id,
+t1.name,
+t1.squad_number,
+t1.status,
+t1.display_order
+FROM match_players t1
+WHERE
+t1.match_id='{$id}'
+AND t1.team_id = '{$team1_id}' 
+AND t1.status = 'first_eleven'
+ORDER BY  t1.display_order ASC, t1.name ASC
+EOF;
+
+$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+$players_team1_start = array();
+
+while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
+    $players_team1_start[] = $row_player;
+}
+
+
+//team 1 players RESERVE
+$sql = <<<EOF
+SELECT
+t1.id,
+t1.name,
+t1.squad_number,
+t1.status,
+t1.display_order
+FROM match_players t1
+WHERE
+t1.match_id='{$id}'
+AND t1.team_id = '{$team1_id}' 
+AND t1.status = 'substitute'
+ORDER BY  t1.display_order ASC, t1.name ASC
+EOF;
+
+$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+$players_team1_reserve = array();
+
+while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
+    $players_team1_reserve[] = $row_player;
+}
+
+
+
+
+
+
+
+
 //team 2 players
 $sql = <<<EOF
 SELECT
@@ -163,6 +219,57 @@ $players_team2 = array();
 while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
     $players_team2[] = $row_player;
 }
+
+
+//team 2 players OSNOVA
+$sql = <<<EOF
+SELECT
+t1.id,
+t1.name,
+t1.squad_number,
+t1.status,
+t1.display_order
+FROM match_players t1
+WHERE
+t1.match_id='{$id}'
+AND t1.team_id = '{$team2_id}'
+AND t1.status = 'first_eleven'
+ORDER BY t1.display_order ASC, t1.name ASC
+EOF;
+
+$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+$players_team2_start = array();
+
+while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
+    $players_team2_start[] = $row_player;
+}
+
+
+//team 2 players RESERVE
+$sql = <<<EOF
+SELECT
+t1.id,
+t1.name,
+t1.squad_number,
+t1.status,
+t1.display_order
+FROM match_players t1
+WHERE
+t1.match_id='{$id}'
+AND t1.team_id = '{$team2_id}' 
+AND t1.status = 'substitute'
+ORDER BY  t1.display_order ASC, t1.name ASC
+EOF;
+
+$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+$players_team2_reserve = array();
+
+while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
+    $players_team2_reserve[] = $row_player;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -178,183 +285,88 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
 <body>
 <?php include('menu_section.php'); ?>
 <div class="container">
+    <pre>
+        <?php var_dump($players_team1_start);?>
+    </pre>
     <div class="row" style="margin-top: 10px;">
         <p><strong><?php echo $label_array[81]; ?></strong></p>
+            <form action="" method="post" enctype="multipart/form-data" role="form">
+                <div  class="form-group">
+                <div class="col-lg-4"><h3>Owners</h3>
+                    <div class="start">
+                        <h4>Start</h4>
+                        <?php for ($i = 1; $i <= 11; $i++) { ?>
+                            <select class="form-control" name="<?php echo $i; ?>" size='1'>
+                                <option enabled>Выберите игрока основы</option>
+                                <?php foreach ($players_team1_start as $player) { ?>
+                                    <option value="<?php echo $player['id']; ?>" name="name<?php echo $player['id']; ?>"
+                                    <?php if  ($player['display_order'] == $i) echo 'selected'; ?>>
+                                        <?php
+                                        echo htmlspecialchars   ($player['squad_number']);
+                                        echo " - ";
+                                        echo htmlspecialchars  ($player['name']); ?>
+                                    </option>
+                                <?php }?>
+                            </select>
+                        <?php }?>
+                    </div>
+                    <h4>Reserve</h4>
+                    <select class="form-control" size='1'>
+                        <option enabled>Выберите игрока запаса</option>
+                        <?php foreach ($players_team1_reserve as $player) { ?>
+                            <option  value="i" name="name<?php echo $player['id']; ?>">
+                                <?php
+                                echo htmlspecialchars   ($player['squad_number']);
+                                echo " - ";
+                                echo htmlspecialchars  ($player['name']); ?>
+                            </option>
+                        <?php }?>
+                    </select>
 
-        <form action="" method="post" enctype="multipart/form-data" role="form">
-            <table class="table table-bordered" style="width: 800px;">
-                <tr>
-                    <td valign="top">
-                        <table class="table table-bordered">
-                            <tr class="info">
-                                <td><?php echo htmlspecialchars($row_match_details['home_team']); ?></td>
-                            </tr>
-                            <?php foreach ($players_team1 as $player) {
-                                ?>
-                                <tr>
-                                    <td>
-                                        <p><input type="text" name="name<?php echo $player['id']; ?>"
-                                                  value="<?php echo htmlspecialchars($player['name']); ?>"
-                                                  style="width:160px;"/></p>
-                                        <table class="table">
-                                            <tr>
-                                                <td><?php echo $label_array[20]; ?></td>
-                                                <td><input type="text" name="squad_number<?php echo $player['id']; ?>"
-                                                           value="<?php echo htmlspecialchars
-                                                           ($player['squad_number']); ?>"
-                                                           style="width:160px;"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td><?php echo $label_array[25]; ?></td>
-                                                <td><input type="text" name="display_order<?php echo $player['id']; ?>"
-                                                           value="<?php echo htmlspecialchars
-                                                           ($player['display_order']); ?>"
-                                                           style="width:160px;"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td><?php echo $label_array[82]; ?></td>
-                                                <td>
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio"
-                                                                   name="status<?php echo $player['id']; ?>"
-                                                                   value="not_available"
-                                                                <?php if ($player['status'] == 'not_available') {
-                                                                    echo ' checked="checked"';
-                                                                }
-                                                                ?>>
-                                                            <?php echo $label_array[22]; ?>
-                                                        </label>
-                                                    </div>
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio"
-                                                                   name="status<?php echo $player['id']; ?>"
-                                                                   value="first_eleven"
-                                                                <?php if ($player['status'] == 'first_eleven') {
-                                                                    echo ' checked="checked"';
-                                                                }
-                                                                ?>>
-                                                            <?php
-                                                            if ($script_match_type == 'soccer'){
-                                                                echo $label_array[23];
-                                                            }
-                                                            elseif ($script_match_type == 'rugby'){
-                                                                echo $label_array[132];
-                                                            }
-                                                            ?>
-                                                        </label>
-                                                    </div>
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio"
-                                                                   name="status<?php echo $player['id']; ?>"
-                                                                   value="substitute"
-                                                                <?php if ($player['status'] == 'substitute') {
-                                                                    echo ' checked="checked"';
-                                                                }
-                                                                ?>>
-                                                            <?php echo $label_array[24]; ?>
-                                                        </label>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </table>
-                    </td>
-                    <td valign="top">
-                        <table class="table table-bordered">
-                            <tr class="info">
-                                <td><?php echo htmlspecialchars($row_match_details['away_team']); ?></td>
-                            </tr>
-                            <?php foreach ($players_team2 as $player) {
-                                ?>
-                                <tr>
-                                    <td>
-                                        <p><input type="text" name="name<?php echo $player['id']; ?>"
-                                                  value="<?php echo htmlspecialchars($player['name']); ?>"
-                                                  style="width:160px;"/></p>
-                                        <table class="table">
-                                            <tr>
-                                                <td><?php echo $label_array[20]; ?></td>
-                                                <td><input type="text" name="squad_number<?php echo $player['id']; ?>"
-                                                           value="<?php echo htmlspecialchars
-                                                           ($player['squad_number']); ?>"
-                                                           style="width:160px;"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td><?php echo $label_array[25]; ?></td>
-                                                <td><input type="text" name="display_order<?php echo $player['id']; ?>"
-                                                           value="<?php echo htmlspecialchars
-                                                           ($player['display_order']); ?>"
-                                                           style="width:160px;"/></td>
-                                            </tr>
-                                            <tr>
-                                                <td><?php echo $label_array[82]; ?></td>
-                                                <td>
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio"
-                                                                   name="status<?php echo $player['id']; ?>"
-                                                                   value="not_available"
-                                                                <?php if ($player['status'] == 'not_available') {
-                                                                    echo ' checked="checked"';
-                                                                }
-                                                                ?>>
-                                                            <?php echo $label_array[22]; ?>
-                                                        </label>
-                                                    </div>
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio"
-                                                                   name="status<?php echo $player['id']; ?>"
-                                                                   value="first_eleven"
-                                                                <?php if ($player['status'] == 'first_eleven') {
-                                                                    echo ' checked="checked"';
-                                                                }
-                                                                ?>>
-                                                            <?php
-                                                            if ($script_match_type == 'soccer'){
-                                                                echo $label_array[23];
-                                                            }
-                                                            elseif ($script_match_type == 'rugby'){
-                                                                echo $label_array[132];
-                                                            }
-                                                            ?>
-                                                        </label>
-                                                    </div>
-                                                    <div class="radio">
-                                                        <label>
-                                                            <input type="radio"
-                                                                   name="status<?php echo $player['id']; ?>"
-                                                                   value="substitute"
-                                                                <?php if ($player['status'] == 'substitute') {
-                                                                    echo ' checked="checked"';
-                                                                }
-                                                                ?>>
-                                                            <?php echo $label_array[24]; ?>
-                                                        </label>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        </table>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </table>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="center">
-                        <input type="hidden" name="csrf_e" value="<?php echo $_SESSION['csrf_e']; ?>"/>
-                        <input name="Submit" value="<?php echo $label_array[2]; ?>" type="submit"/>
-                    </td>
-                </tr>
-            </table>
-        </form>
+
+                </div>
+
+                <div class="col-lg-4"><h3>Guests</h3>
+                    <div class="start">
+                        <h4>Start</h4>
+                        <?php for ($i = 1; $i <= 11; $i++) { ?>
+
+                            <select class="form-control" size='1'>
+                                <option enabled>Выберите игрока основы</option>
+                                <?php foreach ($players_team2_start as $player) { ?>
+                                    <option value="i" name="name<?php echo $player['id']; ?>"
+                                        <?php if  ($player['display_order'] == $i) echo 'selected'; ?>git >
+                                        <?php
+                                        echo htmlspecialchars   ($player['squad_number']);
+                                        echo " - ";
+                                        echo htmlspecialchars  ($player['name']); ?>
+                                    </option>
+                                <?php }?>
+                            </select>
+                        <?php }?>
+                    </div>
+
+                    <h4>Reserve</h4>
+                    <select class="form-control" size='1'>
+                        <option enabled>Выберите игрока запаса</option>
+                        <?php foreach ($players_team2_reserve as $player) { ?>
+                            <option value="i" name="name<?php echo $player['id']; ?>">
+                                <?php
+                                echo htmlspecialchars   ($player['squad_number']);
+                                echo " - ";
+                                echo htmlspecialchars  ($player['name']); ?>
+                            </option>
+                        <?php }?>
+                    </select>
+                </div>
+                <div class="col-lg-12">
+                    <input type="hidden" name="csrf_e" value="<?php echo $_SESSION['csrf_e']; ?>"/>
+                    <input name="Submit"  class="btn btn-primary" value="<?php echo $label_array[2]; ?>" type="submit"/>
+                </div>
+                </div>
+            </form>
+            </div>
+        </div>
     </div>
 </div>
 </body>
