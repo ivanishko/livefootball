@@ -1,0 +1,182 @@
+CREATE TABLE commentators (
+id int(11) UNSIGNED NOT NULL auto_increment,
+name varchar(20) NOT NULL default '',
+username varchar(20) NOT NULL default '',
+password varchar(20) NOT NULL default '',
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+/*
+status:
+temp
+not_started
+first_half
+second_half
+half_time
+finished
+*/
+CREATE TABLE matches (
+id int(11) UNSIGNED NOT NULL auto_increment,
+team1_id int(11) UNSIGNED NOT NULL default 0,
+team2_id int(11) UNSIGNED NOT NULL default 0,
+title varchar(255) NOT NULL default '',
+description varchar(255) NOT NULL default '',
+match_date varchar(30) NOT NULL default '',
+referee_head varchar(255) NOT NULL default '',
+referee_assistant varchar(255) NOT NULL default '',
+referee_assistant2 varchar(255) NOT NULL default '',
+referee_fourth varchar(255) NOT NULL default '',
+stadium varchar(100) NOT NULL default '',
+status varchar(25) NOT NULL default 'temp',
+commentator_id int(11) UNSIGNED NOT NULL default 0,
+last_start_time int(11) UNSIGNED NOT NULL default 0,
+match_revision_nr int(11) UNSIGNED NOT NULL default 0,
+comment_revision_nr int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (is_deleted),
+KEY (status)
+) ENGINE=MyISAM CHARSET=utf8;
+
+CREATE TABLE teams (
+id int(11) UNSIGNED NOT NULL auto_increment,
+name varchar(20) NOT NULL default '',
+logo varchar(250) NOT NULL default '',
+manager varchar(60) NOT NULL default '',
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+/*
+default_status:
+not_available
+substitute
+first_eleven
+*/
+CREATE TABLE team_players (
+id int(11) UNSIGNED NOT NULL auto_increment,
+team_id int(11) UNSIGNED NOT NULL default 0,
+name varchar(30) NOT NULL default '',
+squad_number varchar(30) NOT NULL default '',
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+display_order tinyint UNSIGNED NOT NULL default 0,
+default_status varchar(25) NOT NULL default 'not_available',
+PRIMARY KEY (id),
+KEY (is_deleted),
+KEY (display_order)
+) ENGINE=MyISAM CHARSET=utf8;
+
+/*
+status:
+not_available
+substitute
+first_eleven
+*/
+CREATE TABLE match_players (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_id int(11) UNSIGNED NOT NULL default 0,
+team_id int UNSIGNED NOT NULL default 0,
+team_player_id int UNSIGNED NOT NULL default 0,
+name varchar(30) NOT NULL default '',
+squad_number varchar(30) NOT NULL default '',
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+display_order tinyint UNSIGNED NOT NULL default 0,
+status varchar(25) NOT NULL default 'not_available',
+PRIMARY KEY (id),
+KEY (is_deleted),
+KEY (match_id, team_id),
+KEY (display_order)
+) ENGINE=MyISAM CHARSET=utf8;
+
+/*
+comment_type:
+standard
+goal
+yellow
+red
+substitution
+*/
+CREATE TABLE commentation (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_id int(11) UNSIGNED NOT NULL default 0,
+comment_minute varchar(10) NOT NULL default '',
+comment varchar(255) NOT NULL default '',
+comment_type varchar(20) NOT NULL default 'standard',
+insert_time int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (insert_time),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+CREATE TABLE match_goals (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_player_id int(11) UNSIGNED NOT NULL default 0,
+goal_minute varchar(6) NOT NULL default '',
+is_penalty_goal tinyint(1) NOT NULL DEFAULT 0,
+is_own_goal tinyint(1) NOT NULL DEFAULT 0,
+insert_time int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (insert_time),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+CREATE TABLE match_substitutions (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_player_id_in int(11) UNSIGNED NOT NULL default 0,
+match_player_id_out int(11) UNSIGNED NOT NULL default 0,
+substitution_minute varchar(6) NOT NULL default '',
+insert_time int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (insert_time),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+/*
+card_type:
+yellow
+red
+*/
+CREATE TABLE match_cards (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_player_id int(11) UNSIGNED NOT NULL default 0,
+card_type varchar(20) NOT NULL default 'standard',
+card_minute varchar(6) NOT NULL default '',
+insert_time int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (insert_time),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+CREATE TABLE rugby_score_types (
+id int(11) UNSIGNED NOT NULL auto_increment,
+type varchar(10) NOT NULL default '',
+point tinyint UNSIGNED NOT NULL default 1,
+display_order tinyint UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (point),
+KEY (display_order),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+INSERT INTO rugby_score_types (type, point, display_order)
+VALUES ('penalty_try', 3, 0), ('conversion', 2, 1), ('try', 5, 2);
+
+CREATE TABLE rugby_match_scores (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_player_id int(11) UNSIGNED NOT NULL default 0,
+score_minute varchar(6) NOT NULL default '',
+rugby_score_type_id int(11) UNSIGNED NOT NULL default 0,
+insert_time int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (insert_time),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;

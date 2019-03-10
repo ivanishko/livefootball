@@ -1,0 +1,12 @@
+CREATE TABLE commentators (
+id int(11) UNSIGNED NOT NULL auto_increment,
+name varchar(20) NOT NULL default '',
+username varchar(20) NOT NULL default '',
+password varchar(20) NOT NULL default '',
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+ALTER TABLE matches MODIFY COLUMN stadium varchar(100) NOT NULL default '';
+ALTER TABLE matches ADD commentator_id int(11) UNSIGNED NOT NULL default 0;

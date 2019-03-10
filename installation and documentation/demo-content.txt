@@ -1,0 +1,151 @@
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+
+
+INSERT INTO `commentation` (`id`, `match_id`, `comment_minute`, `comment`, `comment_type`, `is_deleted`, `insert_time`) VALUES
+(1, 1, '0', 'Match started.', 'standard', 0, 0),
+(2, 1, '3', 'Player 2-14 scores!', 'goal', 0, 6),
+(3, 1, '4', 'Yellow card Player 2-14!', 'yellow', 0, 8),
+(4, 1, '11', 'Chance Player 2-10', 'standard', 0, 22),
+(5, 1, '12', 'Shot on target Player 2-22', 'standard', 0, 24),
+(6, 1, '15', 'Yellow card Player 1-14.', 'yellow', 0, 30),
+(7, 1, '19', 'Offside Player 1-11', 'standard', 0, 38),
+(8, 1, '38', 'Penalty for Team 2!', 'standard', 0, 75),
+(9, 1, '39', 'Player 2-10 scores! (penalty)', 'goal', 0, 78),
+(10, 1, '42', 'Player 2-10 scores again!', 'goal', 0, 84),
+(11, 1, '45', 'Second half started', 'standard', 0, 90),
+(12, 1, '46', 'Substitution on Team 1. (Player 1-6 out, Player 1-3 in.)', 'substitution', 0, 92),
+(13, 1, '46', 'Substitution on Team 1. (Player 1-19 in, Player 1-7 out)', 'substitution', 0, 92),
+(14, 1, '48', 'Yellow card for Player 1-20!', 'yellow', 0, 96),
+(15, 1, '57', 'Offside Player 2-29', 'standard', 0, 114),
+(16, 1, '58', 'Yellow card. Player 1-27', 'yellow', 0, 116),
+(17, 1, '38', 'Yellow card Player 1-5', 'yellow', 0, 76),
+(18, 1, '59', 'Red card Player 1-5', 'red', 0, 118),
+(19, 1, '61', 'Foul Player 1-8', 'standard', 0, 122),
+(20, 1, '61', 'Substitution on Team 1. (Player 1-4 in, Player 1-18 out)', 'substitution', 0, 122),
+(21, 1, '66', 'Shot on target Player 2-14', 'standard', 0, 132),
+(22, 1, '67', 'Substitution on Team 2. (Player 2-4 in, Player 2-14 out)', 'substitution', 0, 134),
+(23, 1, '75', 'Shot on target Player 2-29', 'standard', 0, 150),
+(24, 1, '75', 'Catch Player 1-1', 'standard', 0, 150),
+(25, 1, '75', 'Substitution on Team 2. (Player 2-27 in, Player 2-22 out)', 'substitution', 0, 150),
+(26, 1, '76', 'Shot on target Player 1-3', 'standard', 0, 152),
+(27, 1, '88', 'Successful cross Player 2-17', 'standard', 0, 176),
+(28, 1, '88', 'Shot on target Player 2-4', 'standard', 0, 176),
+(29, 1, '88', 'Goal Player 2-4!', 'goal', 0, 176),
+(30, 1, '90 + 3', 'End of match', 'standard', 0, 190);
+
+INSERT INTO `matches` (`id`, `team1_id`, `team2_id`, `title`, `description`, `match_date`, `referee_head`, `referee_assistant`, `referee_assistant2`, `referee_fourth`, `stadium`, `status`, `last_start_time`, `match_revision_nr`, `comment_revision_nr`, `is_deleted`) VALUES
+(1, 1, 2, 'DEMO League - Matchday - 1', 'Sample match.', '06.06.2014 22:45', 'Head Referee', '', '', '', 'Stadium 1', 'finished', 1401880740, 174, 30, 0);
+
+INSERT INTO `match_cards` (`id`, `match_player_id`, `card_type`, `card_minute`, `is_deleted`, `insert_time`) VALUES
+(1, 24, 'yellow', '4', 0, 4),
+(2, 5, 'yellow', '15', 0, 15),
+(3, 2, 'yellow', '48', 0, 48),
+(4, 6, 'yellow', '58', 0, 58),
+(5, 3, 'yellow', '38', 0, 38),
+(6, 3, 'red', '59', 0, 59);
+
+INSERT INTO `match_goals` (`id`, `match_player_id`, `goal_minute`, `is_penalty_goal`, `is_own_goal`, `is_deleted`, `insert_time`) VALUES
+(1, 24, '3', 0, 0, 0, 3),
+(2, 28, '39', 1, 0, 0, 39),
+(3, 28, '42', 0, 0, 0, 42),
+(4, 31, '88', 0, 0, 0, 88);
+
+INSERT INTO `match_players` (`id`, `match_id`, `team_id`, `team_player_id`, `name`, `squad_number`, `is_deleted`, `display_order`, `status`) VALUES
+(1, 1, 1, 1, 'Player 1-1', '1', 0, 1, 'first_eleven'),
+(2, 1, 1, 2, 'Player 1-20', '20', 0, 2, 'first_eleven'),
+(3, 1, 1, 3, 'Player 1-5', '5', 0, 3, 'first_eleven'),
+(4, 1, 1, 4, 'Player 1-21', '21', 0, 4, 'first_eleven'),
+(5, 1, 1, 5, 'Player 1-14', '14', 0, 5, 'first_eleven'),
+(6, 1, 1, 6, 'Player 1-27', '27', 0, 6, 'first_eleven'),
+(7, 1, 1, 7, 'Player 1-6', '6', 0, 7, 'first_eleven'),
+(8, 1, 1, 8, 'Player 1-8', '8', 0, 8, 'first_eleven'),
+(9, 1, 1, 9, 'Player 1-7', '7', 0, 9, 'first_eleven'),
+(10, 1, 1, 10, 'Player 1-11', '11', 0, 10, 'first_eleven'),
+(11, 1, 1, 11, 'Player 1-18', '18', 0, 11, 'first_eleven'),
+(12, 1, 1, 12, 'Player 1-22', '22', 0, 1, 'substitute'),
+(13, 1, 1, 13, 'Player 1-3', '3', 0, 2, 'substitute'),
+(14, 1, 1, 14, 'Player 1-19', '19', 0, 3, 'substitute'),
+(15, 1, 1, 15, 'Player 1-4', '4', 0, 4, 'substitute'),
+(16, 1, 1, 16, 'Player 1-15', '15', 0, 5, 'substitute'),
+(17, 1, 1, 17, 'Player 1-17', '17', 0, 6, 'substitute'),
+(18, 1, 1, 18, 'Player 1-13', '13', 0, 7, 'substitute'),
+(19, 1, 2, 19, 'Player 2-30', '30', 0, 1, 'first_eleven'),
+(20, 1, 2, 20, 'Player 2-17', '17', 0, 2, 'first_eleven'),
+(21, 1, 2, 21, 'Player 2-2', '2', 0, 3, 'first_eleven'),
+(22, 1, 2, 22, 'Player 2-13', '13', 0, 4, 'first_eleven'),
+(23, 1, 2, 23, 'Player 2-23', '23', 0, 5, 'first_eleven'),
+(24, 1, 2, 24, 'Player 2-14', '14', 0, 6, 'first_eleven'),
+(25, 1, 2, 25, 'Player 2-8', '8', 0, 7, 'first_eleven'),
+(26, 1, 2, 26, 'Player 2-24', '24', 0, 8, 'first_eleven'),
+(27, 1, 2, 27, 'Player 2-22', '22', 0, 9, 'first_eleven'),
+(28, 1, 2, 28, 'Player 2-10', '10', 0, 10, 'first_eleven'),
+(29, 1, 2, 29, 'Player 2-29', '29', 0, 11, 'first_eleven'),
+(30, 1, 2, 30, 'Player 2-1', '1', 0, 1, 'substitute'),
+(31, 1, 2, 31, 'Player 2-4', '4', 0, 2, 'substitute'),
+(32, 1, 2, 32, 'Player 2-27', '27', 0, 3, 'substitute'),
+(34, 1, 2, 34, 'Player 2-7', '7', 0, 4, 'substitute'),
+(35, 1, 2, 35, 'Player 2-21', '21', 0, 5, 'substitute'),
+(36, 1, 2, 36, 'Player 2-25', '25', 0, 6, 'substitute'),
+(37, 1, 2, 37, 'Player 2-5', '5', 0, 7, 'substitute');
+
+INSERT INTO `match_substitutions` (`id`, `match_player_id_in`, `match_player_id_out`, `substitution_minute`, `is_deleted`, `insert_time`) VALUES
+(1, 13, 7, '46', 0, 46),
+(2, 14, 9, '46', 0, 46),
+(3, 15, 11, '61', 0, 61),
+(4, 31, 24, '67', 0, 67),
+(5, 32, 27, '75', 0, 75);
+
+INSERT INTO `teams` (`id`, `name`, `logo`, `manager`, `is_deleted`) VALUES
+(1, 'Team 1', 'img/logo/demo-t1.png', 'Manager 1', 0),
+(2, 'Team 2', 'img/logo/demo-t2.png', 'Manager 2', 0);
+
+INSERT INTO `team_players` (`id`, `team_id`, `name`, `squad_number`, `is_deleted`, `display_order`, `default_status`) VALUES
+(1, 1, 'Player 1-1', '1', 0, 1, 'first_eleven'),
+(2, 1, 'Player 1-20', '20', 0, 2, 'first_eleven'),
+(3, 1, 'Player 1-5', '5', 0, 3, 'first_eleven'),
+(4, 1, 'Player 1-21', '21', 0, 4, 'first_eleven'),
+(5, 1, 'Player 1-14', '14', 0, 5, 'first_eleven'),
+(6, 1, 'Player 1-27', '27', 0, 6, 'first_eleven'),
+(7, 1, 'Player 1-6', '6', 0, 7, 'first_eleven'),
+(8, 1, 'Player 1-8', '8', 0, 8, 'first_eleven'),
+(9, 1, 'Player 1-7', '7', 0, 9, 'first_eleven'),
+(10, 1, 'Player 1-11', '11', 0, 10, 'first_eleven'),
+(11, 1, 'Player 1-18', '18', 0, 11, 'first_eleven'),
+(12, 1, 'Player 1-22', '22', 0, 1, 'substitute'),
+(13, 1, 'Player 1-3', '3', 0, 2, 'substitute'),
+(14, 1, 'Player 1-19', '19', 0, 3, 'substitute'),
+(15, 1, 'Player 1-4', '4', 0, 4, 'substitute'),
+(16, 1, 'Player 1-15', '15', 0, 5, 'substitute'),
+(17, 1, 'Player 1-17', '17', 0, 6, 'substitute'),
+(18, 1, 'Player 1-13', '13', 0, 7, 'substitute'),
+(19, 2, 'Player 2-30', '30', 0, 1, 'first_eleven'),
+(20, 2, 'Player 2-17', '17', 0, 2, 'first_eleven'),
+(21, 2, 'Player 2-2', '2', 0, 3, 'first_eleven'),
+(22, 2, 'Player 2-13', '13', 0, 4, 'first_eleven'),
+(23, 2, 'Player 2-23', '23', 0, 5, 'first_eleven'),
+(24, 2, 'Player 2-14', '14', 0, 6, 'first_eleven'),
+(25, 2, 'Player 2-8', '8', 0, 7, 'first_eleven'),
+(26, 2, 'Player 2-24', '24', 0, 8, 'first_eleven'),
+(27, 2, 'Player 2-22', '22', 0, 9, 'first_eleven'),
+(28, 2, 'Player 2-10', '10', 0, 10, 'first_eleven'),
+(29, 2, 'Player 2-29', '29', 0, 11, 'first_eleven'),
+(30, 2, 'Player 2-1', '1', 0, 1, 'substitute'),
+(31, 2, 'Player 2-4', '4', 0, 2, 'substitute'),
+(32, 2, 'Player 2-27', '27', 0, 3, 'substitute'),
+(34, 2, 'Player 2-7', '7', 0, 4, 'substitute'),
+(35, 2, 'Player 2-21', '21', 0, 5, 'substitute'),
+(36, 2, 'Player 2-25', '25', 0, 6, 'substitute'),
+(37, 2, 'Player 2-5', '5', 0, 7, 'substitute'),
+(38, 2, 'Player 2-', '', 1, 0, 'not_available'),
+(39, 2, 'Player 2-', '', 1, 0, 'not_available'),
+(40, 2, 'Player 2-', '', 1, 0, 'not_available');
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

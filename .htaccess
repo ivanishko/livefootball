@@ -1,0 +1,6 @@
+Options +FollowSymlinks
+RewriteEngine On
+#RewriteBase /
+AddDefaultCharset utf-8
+# match detail
+RewriteRule ^[^/]*_m([0-9]*)\.html$ match.php?id=$1 [L]

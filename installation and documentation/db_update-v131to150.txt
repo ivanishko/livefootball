@@ -1,0 +1,26 @@
+CREATE TABLE rugby_score_types (
+id int(11) UNSIGNED NOT NULL auto_increment,
+type varchar(10) NOT NULL default '',
+point tinyint UNSIGNED NOT NULL default 1,
+display_order tinyint UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (point),
+KEY (display_order),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
+
+INSERT INTO rugby_score_types (type, point, display_order)
+VALUES ('penalty_try', 3, 0), ('conversion', 2, 1), ('try', 5, 2);
+
+CREATE TABLE rugby_match_scores (
+id int(11) UNSIGNED NOT NULL auto_increment,
+match_player_id int(11) UNSIGNED NOT NULL default 0,
+score_minute varchar(6) NOT NULL default '',
+rugby_score_type_id int(11) UNSIGNED NOT NULL default 0,
+insert_time int(11) UNSIGNED NOT NULL default 0,
+is_deleted tinyint(1) NOT NULL DEFAULT 0,
+PRIMARY KEY (id),
+KEY (insert_time),
+KEY (is_deleted)
+) ENGINE=MyISAM CHARSET=utf8;
