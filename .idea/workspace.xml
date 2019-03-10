@@ -35,8 +35,8 @@
       <file leaf-file-name="match_player_selection2.php" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/admin/match_player_selection2.php">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="323">
-              <caret line="337" column="106" selection-start-line="337" selection-start-column="106" selection-end-line="337" selection-end-column="106" />
+            <state relative-caret-position="255">
+              <caret line="296" column="93" lean-forward="true" selection-start-line="296" selection-start-column="93" selection-end-line="296" selection-end-column="93" />
               <folding>
                 <element signature="n#style#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
               </folding>
@@ -116,12 +116,12 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1552213232970</updated>
-      <workItem from="1552213234437" duration="14993000" />
+      <workItem from="1552213234437" duration="16035000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="14993000" />
+    <option name="totallyTimeSpent" value="16035000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
@@ -171,8 +171,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/admin/match_player_selection2.php">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="323">
-          <caret line="337" column="106" selection-start-line="337" selection-start-column="106" selection-end-line="337" selection-end-column="106" />
+        <state relative-caret-position="255">
+          <caret line="296" column="93" lean-forward="true" selection-start-line="296" selection-start-column="93" selection-end-line="296" selection-end-column="93" />
           <folding>
             <element signature="n#style#0;n#div#0;n#div#0;n#body#0;n#html#0;n#!!top" expanded="true" />
           </folding>

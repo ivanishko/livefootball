@@ -118,28 +118,6 @@ $_SESSION['csrf_e'] = md5(uniqid());
 $team1_id = $row_match_details['team1_id'];
 $team2_id = $row_match_details['team2_id'];
 
-//team 1 players
-$sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-t1.display_order
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team1_id}'
-ORDER BY t1.status ASC,  t1.display_order ASC, t1.name ASC
-EOF;
-
-$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-$players_team1 = array();
-
-while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-    $players_team1[] = $row_player;
-}
 
 //team 1 players OSNOVA
 $sql = <<<EOF
@@ -148,7 +126,8 @@ t1.id,
 t1.name,
 t1.squad_number,
 t1.status,
-t1.display_order
+t1.display_order,
+t1.match_order
 FROM match_players t1
 WHERE
 t1.match_id='{$id}'
@@ -173,7 +152,8 @@ t1.id,
 t1.name,
 t1.squad_number,
 t1.status,
-t1.display_order
+t1.display_order,
+t1.match_order
 FROM match_players t1
 WHERE
 t1.match_id='{$id}'
@@ -197,28 +177,6 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
 
 
 
-//team 2 players
-$sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-t1.display_order
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team2_id}'
-ORDER BY t1.status ASC,  t1.display_order ASC, t1.name ASC
-EOF;
-
-$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-$players_team2 = array();
-
-while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-    $players_team2[] = $row_player;
-}
 
 
 //team 2 players OSNOVA
@@ -228,7 +186,8 @@ t1.id,
 t1.name,
 t1.squad_number,
 t1.status,
-t1.display_order
+t1.display_order,
+t1.match_order
 FROM match_players t1
 WHERE
 t1.match_id='{$id}'
@@ -253,7 +212,8 @@ t1.id,
 t1.name,
 t1.squad_number,
 t1.status,
-t1.display_order
+t1.display_order,
+t1.match_order
 FROM match_players t1
 WHERE
 t1.match_id='{$id}'
@@ -335,7 +295,7 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                                 <option enabled>Выберите игрока основы</option>
                                 <?php foreach ($players_team2_start as $player) { ?>
                                     <option value="i" name="name<?php echo $player['id']; ?>"
-                                        <?php if  ($player['display_order'] == $i) echo 'selected'; ?>git >
+                                        <?php if  ($player['display_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
                                         echo " - ";
