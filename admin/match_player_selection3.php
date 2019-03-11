@@ -306,7 +306,7 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                                     <input onchange="countCheck();"
                                            class="guest-not-available" type="radio"
                                            name="status<?php echo $player['id']; ?>"
-                                           value="ownernot_available"
+                                           value="not_available"
                                         <?php if ($player['status'] == 'not_available') {
                                             echo ' checked';
                                         }
