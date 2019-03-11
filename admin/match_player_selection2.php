@@ -11,13 +11,6 @@ require_once('../Connections/conn.php');
 
 
 
-    echo "<pre>";
-    var_dump($_POST);
-    echo "</pre>";
-
-
-
-
 
 
 if (isset($_GET['id'])) {
@@ -52,25 +45,64 @@ EOF;
     exit();
 }
 
+
+
+
+
+// сто пудово рабочая проверка
+if (count($_POST) > 0) {
+    echo "<pre>";
+    var_dump($_POST);
+
+    echo "</pre>";
+
+    foreach ($_POST as $key => $value) {
+        if (preg_match('/team1_player([0-9]*)/', $key, $result)) {
+            $name = prepare_for_db($value);
+
+            $sql = <<<EOF
+UPDATE match_players
+SET
+name = '{$name}'
+WHERE
+id='{$result[1]}'
+EOF;
+            echo '<pre>';
+            var_dump($sql);
+            echo '</pre>';
+            mysqli_query($conn, $sql) or die(mysqli_error($conn));
+        }
+    }
+// сто пудово рабочая проверка
+
+}
+
+
+
+
+
+
 if (isset($_POST['Submit'])
     && isset($_POST['csrf_e'])
     && isset($_SESSION['csrf_e'])
     && $_POST['csrf_e'] == $_SESSION['csrf_e']
 )
 {
-
-
+    echo "hello world";
+    var_dump($_POST);
     foreach ($_POST as $key => $value) {
-        if (preg_match('/display_order([0-9]*)/', $key, $result)) {
-            $display_order = (intval($value) <= 255 ? intval($value) : 0);
+        if (preg_match('/match_order([0-9]*)/', $key, $result)) {
+            $match_order = (intval($value) <= 255 ? intval($value) : 0);
 
             $sql = <<<EOF
 UPDATE match_players
 SET
-display_order = '{$display_order}'
+match_order = '{$match_order}'
+display_order = '{$match_order}'
 WHERE
 id='{$result[1]}'
 EOF;
+            var_dump($sql);
             mysqli_query($conn, $sql) or die(mysqli_error($conn));
         }
 
@@ -184,10 +216,11 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                     <div class="start">
                         <h4>Start</h4>
                         <?php for ($i = 1; $i <= 11; $i++) { ?>
+
                             <select class="form-control" name="team1_player<?php echo $i; ?>" size='1'>
                                 <option value="" enabled>Выберите игрока основы</option>
                                 <?php foreach ($players_team1 as $player) { ?>
-                                    <option value="<?php echo $player['id']; ?>"
+                                    <option value="<?php echo $player['name']; ?>"
                                     <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
@@ -196,17 +229,17 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                                     </option>
                                 <?php }?>
                             </select>
+                            <?php }?>
 
-                        <?php }?>
 
                     </div>
                     <div class="reserve">
                         <h4>Reserve</h4>
                         <?php for ($i = 12; $i <= 21; $i++) { ?>
-                            <select class="form-control" name="team1_player<?php echo $i; ?>" size='1'>
+                            <select class="form-control" name="team1_player<?php echo $player['id']; ?>" size='1'>
                                 <option value=""  enabled>Выберите игрока запаса</option>
                                 <?php foreach ($players_team1 as $player) { ?>
-                                    <option  value="<?php echo $player['id']; ?>"
+                                    <option  value="<?php echo $player['name']; ?>"
                                         <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
@@ -225,10 +258,10 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                     <div class="start">
                         <h4>Start</h4>
                         <?php for ($i = 1; $i <= 11; $i++) { ?>
-                            <select class="form-control" name="team2_player<?php echo $i; ?>" size='1'>
+                            <select class="form-control" name="team2_player<?php echo $player['id']; ?>" size='1'>
                                 <option value="" enabled>Выберите игрока основы</option>
                                 <?php foreach ($players_team2 as $player) { ?>
-                                    <option value="<?php echo $player['id']; ?>"
+                                    <option value="<?php echo $player['name']; ?>"
                                         <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
@@ -242,10 +275,10 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                     <div class="reserve">
                         <h4>Reserve</h4>
                         <?php for ($i = 12; $i <= 21; $i++) { ?>
-                            <select class="form-control" name="team2_player<?php echo $i; ?>" size='1'>
+                            <select class="form-control" name="team2_player<?php echo $player['id']; ?>" size='1'>
                                 <option value="" enabled>Выберите игрока запаса</option>
                                 <?php foreach ($players_team2 as $player) { ?>
-                                    <option  value="<?php echo $player['id']; ?>"
+                                    <option  value="<?php echo $player['name']; ?>"
                                         <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
