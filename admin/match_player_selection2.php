@@ -9,8 +9,21 @@ if (!isset($_SESSION['script_user'])) {
 
 require_once('../Connections/conn.php');
 
+
+
+    echo "<pre>";
+    var_dump($_POST);
+    echo "</pre>";
+
+
+
+
+
+
 if (isset($_GET['id'])) {
     $id = intval($_GET['id']);
+
+
 
     $sql = <<<EOF
 SELECT
@@ -43,34 +56,11 @@ if (isset($_POST['Submit'])
     && isset($_POST['csrf_e'])
     && isset($_SESSION['csrf_e'])
     && $_POST['csrf_e'] == $_SESSION['csrf_e']
-) {
+)
+{
+
+
     foreach ($_POST as $key => $value) {
-        if (preg_match('/name([0-9]*)/', $key, $result)) {
-            $name = prepare_for_db($value);
-
-            $sql = <<<EOF
-UPDATE match_players
-SET
-name = '{$name}'
-WHERE
-id='{$result[1]}'
-EOF;
-            mysqli_query($conn, $sql) or die(mysqli_error($conn));
-        }
-
-        if (preg_match('/squad_number([0-9]*)/', $key, $result)) {
-            $squad_number = prepare_for_db($value);
-
-            $sql = <<<EOF
-UPDATE match_players
-SET
-squad_number = '{$squad_number}'
-WHERE
-id='{$result[1]}'
-EOF;
-            mysqli_query($conn, $sql) or die(mysqli_error($conn));
-        }
-
         if (preg_match('/display_order([0-9]*)/', $key, $result)) {
             $display_order = (intval($value) <= 255 ? intval($value) : 0);
 
@@ -109,7 +99,7 @@ EOF;
         mysqli_query($conn, $sql) or die(mysqli_error($conn));
     }
 
-    header("Location: match_player_selection.php?id=" . $id);
+    header("Location: match_player_selection2.php?id=" . $id);
     exit();
 }
 
@@ -132,49 +122,16 @@ FROM match_players t1
 WHERE
 t1.match_id='{$id}'
 AND t1.team_id = '{$team1_id}' 
-AND t1.status = 'first_eleven'
 ORDER BY  t1.display_order ASC, t1.name ASC
 EOF;
 
 $Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
 
-$players_team1_start = array();
+$players_team1 = array();
 
 while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-    $players_team1_start[] = $row_player;
+    $players_team1[] = $row_player;
 }
-
-
-//team 1 players RESERVE
-$sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-t1.display_order,
-t1.match_order
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team1_id}' 
-AND t1.status = 'substitute'
-ORDER BY  t1.display_order ASC, t1.name ASC
-EOF;
-
-$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-$players_team1_reserve = array();
-
-while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-    $players_team1_reserve[] = $row_player;
-}
-
-
-
-
-
-
 
 
 
@@ -192,43 +149,18 @@ FROM match_players t1
 WHERE
 t1.match_id='{$id}'
 AND t1.team_id = '{$team2_id}'
-AND t1.status = 'first_eleven'
 ORDER BY t1.display_order ASC, t1.name ASC
 EOF;
 
 $Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
 
-$players_team2_start = array();
+$players_team2 = array();
 
 while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-    $players_team2_start[] = $row_player;
+    $players_team2[] = $row_player;
 }
 
 
-//team 2 players RESERVE
-$sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-t1.display_order,
-t1.match_order
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team2_id}' 
-AND t1.status = 'substitute'
-ORDER BY  t1.display_order ASC, t1.name ASC
-EOF;
-
-$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-$players_team2_reserve = array();
-
-while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-    $players_team2_reserve[] = $row_player;
-}
 
 ?>
 <!DOCTYPE html>
@@ -245,22 +177,37 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
 <body>
 <?php include('menu_section.php'); ?>
 <div class="container">
-    <pre>
-        <?php var_dump($players_team1_start);?>
-    </pre>
     <div class="row" style="margin-top: 10px;">
         <p><strong><?php echo $label_array[81]; ?></strong></p>
-            <form action="" method="post" enctype="multipart/form-data" role="form">
-                <div  class="form-group">
-                <div class="col-lg-4"><h3>Owners</h3>
+            <form action="" method="post">
+                <div class="col-lg-4"><h3><?php echo htmlspecialchars($row_match_details['home_team']); ?></h3>
                     <div class="start">
                         <h4>Start</h4>
                         <?php for ($i = 1; $i <= 11; $i++) { ?>
-                            <select class="form-control" name="<?php echo $i; ?>" size='1'>
-                                <option enabled>Выберите игрока основы</option>
-                                <?php foreach ($players_team1_start as $player) { ?>
-                                    <option value="<?php echo $player['id']; ?>" name="name<?php echo $player['id']; ?>"
-                                    <?php if  ($player['display_order'] == $i) echo 'selected'; ?>>
+                            <select class="form-control" name="team1_player<?php echo $i; ?>" size='1'>
+                                <option value="" enabled>Выберите игрока основы</option>
+                                <?php foreach ($players_team1 as $player) { ?>
+                                    <option value="<?php echo $player['id']; ?>"
+                                    <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
+                                        <?php
+                                        echo htmlspecialchars   ($player['squad_number']);
+                                        echo " - ";
+                                        echo htmlspecialchars  ($player['name']); ?>
+                                    </option>
+                                <?php }?>
+                            </select>
+
+                        <?php }?>
+
+                    </div>
+                    <div class="reserve">
+                        <h4>Reserve</h4>
+                        <?php for ($i = 12; $i <= 21; $i++) { ?>
+                            <select class="form-control" name="team1_player<?php echo $i; ?>" size='1'>
+                                <option value=""  enabled>Выберите игрока запаса</option>
+                                <?php foreach ($players_team1 as $player) { ?>
+                                    <option  value="<?php echo $player['id']; ?>"
+                                        <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
                                         echo " - ";
@@ -270,32 +217,36 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                             </select>
                         <?php }?>
                     </div>
-                    <h4>Reserve</h4>
-                    <select class="form-control" size='1'>
-                        <option enabled>Выберите игрока запаса</option>
-                        <?php foreach ($players_team1_reserve as $player) { ?>
-                            <option  value="i" name="name<?php echo $player['id']; ?>">
-                                <?php
-                                echo htmlspecialchars   ($player['squad_number']);
-                                echo " - ";
-                                echo htmlspecialchars  ($player['name']); ?>
-                            </option>
-                        <?php }?>
-                    </select>
 
 
                 </div>
 
-                <div class="col-lg-4"><h3>Guests</h3>
+                <div class="col-lg-4"><h3><?php echo htmlspecialchars($row_match_details['away_team']); ?></h3>
                     <div class="start">
                         <h4>Start</h4>
                         <?php for ($i = 1; $i <= 11; $i++) { ?>
-
-                            <select class="form-control" size='1'>
-                                <option enabled>Выберите игрока основы</option>
-                                <?php foreach ($players_team2_start as $player) { ?>
-                                    <option value="i" name="name<?php echo $player['id']; ?>"
-                                        <?php if  ($player['display_order'] == $i) echo 'selected'; ?>>
+                            <select class="form-control" name="team2_player<?php echo $i; ?>" size='1'>
+                                <option value="" enabled>Выберите игрока основы</option>
+                                <?php foreach ($players_team2 as $player) { ?>
+                                    <option value="<?php echo $player['id']; ?>"
+                                        <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
+                                        <?php
+                                        echo htmlspecialchars   ($player['squad_number']);
+                                        echo " - ";
+                                        echo htmlspecialchars  ($player['name']); ?>
+                                    </option>
+                                <?php }?>
+                            </select>
+                        <?php }?>
+                    </div>
+                    <div class="reserve">
+                        <h4>Reserve</h4>
+                        <?php for ($i = 12; $i <= 21; $i++) { ?>
+                            <select class="form-control" name="team2_player<?php echo $i; ?>" size='1'>
+                                <option value="" enabled>Выберите игрока запаса</option>
+                                <?php foreach ($players_team2 as $player) { ?>
+                                    <option  value="<?php echo $player['id']; ?>"
+                                        <?php if  ($player['match_order'] == $i) echo 'selected'; ?>>
                                         <?php
                                         echo htmlspecialchars   ($player['squad_number']);
                                         echo " - ";
@@ -306,27 +257,12 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                         <?php }?>
                     </div>
 
-                    <h4>Reserve</h4>
-                    <select class="form-control" size='1'>
-                        <option enabled>Выберите игрока запаса</option>
-                        <?php foreach ($players_team2_reserve as $player) { ?>
-                            <option value="i" name="name<?php echo $player['id']; ?>">
-                                <?php
-                                echo htmlspecialchars   ($player['squad_number']);
-                                echo " - ";
-                                echo htmlspecialchars  ($player['name']); ?>
-                            </option>
-                        <?php }?>
-                    </select>
                 </div>
                 <div class="col-lg-12">
-                    <input type="hidden" name="csrf_e" value="<?php echo $_SESSION['csrf_e']; ?>"/>
-                    <input name="Submit"  class="btn btn-primary" value="<?php echo $label_array[2]; ?>" type="submit"/>
-                </div>
+                   <!-- <input type="hidden" name="csrf_e" value="<?php echo $_SESSION['csrf_e']; ?>"/> -->
+                    <input name="Submit" name="submit" class="btn btn-primary" value="<?php echo $label_array[2]; ?>" type="submit"/>
                 </div>
             </form>
-            </div>
-        </div>
     </div>
 </div>
 </body>
