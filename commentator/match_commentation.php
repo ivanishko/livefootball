@@ -89,75 +89,7 @@ EOF;
 			exit();
 		}
 	}
-	elseif ($script_match_type == 'rugby'){
-		$sql = <<<EOF
-SELECT
-t1.id,
-t1.status,
-t1.last_start_time,
-t1.team1_id,
-t1.team2_id,
-t2.name AS home_team,
-t3.name AS away_team,
-(
-	SELECT
-	IFNULL(SUM(t6.point), 0)
-	FROM rugby_match_scores t4
-	INNER JOIN rugby_score_types t6 ON t4.rugby_score_type_id = t6.id
-	INNER JOIN match_players t5 ON t4.match_player_id = t5.id
-	WHERE
-	t5.team_id = t2.id
-	AND t5.match_id = t1.id
-	AND t4.is_deleted = 0
-) AS home_goal_sum,
-(
-	SELECT
-	IFNULL(SUM(t6.point), 0)
-	FROM rugby_match_scores t4
-	INNER JOIN rugby_score_types t6 ON t4.rugby_score_type_id = t6.id
-	INNER JOIN match_players t5 ON t4.match_player_id = t5.id
-	WHERE
-	t5.team_id = t3.id
-	AND t5.match_id = t1.id
-	AND t4.is_deleted = 0
-) AS away_goal_sum
-FROM matches t1
-LEFT JOIN teams t2 ON t1.team1_id = t2.id
-LEFT JOIN teams t3 ON t1.team2_id = t3.id
-WHERE
-t1.id='{$id}'
-AND t1.is_deleted = 0
-AND t1.commentator_id = '{$_SESSION['commentator_user']['id']}'
-EOF;
 
-		$Recordset_MatchDetails = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-		$row_match_details = mysqli_fetch_assoc($Recordset_MatchDetails);
-
-		if (mysqli_num_rows($Recordset_MatchDetails) == 0) {
-			header("Location: matches.php");
-			exit();
-		}
-
-		// create rugby score types array
-		$sql = <<<EOF
-SELECT
-t1.id,
-t1.type,
-t1.point
-FROM rugby_score_types t1
-WHERE
-t1.is_deleted = 0
-ORDER BY display_order ASC
-EOF;
-
-		$Recordset_ScoreTypes = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-		$rugby_score_types = array();
-		while ($row_score_type = mysqli_fetch_assoc($Recordset_ScoreTypes)) {
-			$rugby_score_types[$row_score_type['id']] = $row_score_type;
-		}
-
-	}
 } else {
 	header("Location: matches.php");
 	exit();
@@ -236,59 +168,7 @@ EOF;
 }
 //insert comment - end
 
-//save rugby score record - begin
-if ($script_match_type == 'rugby'){
 
-	if (isset($_POST['insert_score'])
-		&& isset($_POST['minute'])
-		&& isset($_POST['match_player_id'])
-		&& isset($_POST['rugby_score_type_id'])
-		&& trim($_POST['minute']) != ''
-		&& intval($_POST['match_player_id']) > 0
-		&& intval($_POST['rugby_score_type_id']) > 0
-		&& isset($_POST['csrf_i'])
-		&& isset($_SESSION['csrf_i'])
-		&& $_POST['csrf_i'] == $_SESSION['csrf_i']
-	) {
-		$match_player_id = intval($_POST['match_player_id']);
-		$rugby_score_type_id = intval($_POST['rugby_score_type_id']);
-		$minute          = prepare_for_db($_POST['minute']);
-
-		$insert_time = time();
-
-		$sql = <<<EOF
-INSERT INTO rugby_match_scores(
-match_player_id,
-score_minute,
-rugby_score_type_id,
-insert_time
-)
-VALUES(
-'{$match_player_id}',
-'{$minute}',
-'{$rugby_score_type_id}',
-'{$insert_time}'
-)
-EOF;
-
-		mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-		$sql = <<<EOF
-UPDATE matches
-SET
-match_revision_nr = match_revision_nr + 1
-WHERE
-id = $id
-EOF;
-
-		mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-		header("Location: match_commentation.php?id=" . $id);
-		exit();
-	}
-
-}
-//save rugby score record - end
 
 //save goal record - begin
 if ($script_match_type == 'soccer'){
@@ -593,40 +473,6 @@ EOF;
 }
 //match goals - end
 
-//rugby match scores - begin
-if ($script_match_type == 'rugby'){
-	$sql = <<<EOF
-SELECT
-t1.id,
-t1.score_minute,
-t2.name,
-t2.squad_number,
-t2.team_id,
-t3.type,
-t3.point
-FROM rugby_match_scores t1
-INNER JOIN match_players t2 ON t1.match_player_id = t2.id
-INNER JOIN rugby_score_types t3 ON t1.rugby_score_type_id = t3.id
-WHERE
-t2.match_id = '{$id}'
-AND t1.is_deleted = 0
-ORDER BY t1.insert_time DESC
-EOF;
-
-	$Recordset_Scores = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-	$rugby_scores_team1 = array();
-	$rugby_scores_team2 = array();
-
-	while ($row_score = mysqli_fetch_assoc($Recordset_Scores)) {
-		if ($row_score['team_id'] == $team1_id) {
-			$rugby_scores_team1[] = $row_score;
-		} else {
-			$rugby_scores_team2[] = $row_score;
-		}
-	}
-}
-//rugby match scores - end
 
 //match cards - begin
 $sql = <<<EOF
@@ -707,7 +553,7 @@ t1.status,
 	COUNT(1)
 	FROM match_goals t2
 	WHERE
-	t2.match_player_id = t1.id
+	t2.match_player_id = t1.id 
 	AND t2.is_deleted = 0
 ) AS goal_sum
 FROM match_players t1
@@ -774,92 +620,6 @@ EOF;
 	}
 }
 //soccer team players - end
-
-//rugby team players - begin
-if ($script_match_type == 'rugby'){
-	//team 1 players
-	$sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-(
-	SELECT
-	SUM(t3.point)
-	FROM rugby_match_scores t2
-	INNER JOIN rugby_score_types t3 ON t2.rugby_score_type_id = t3.id
-	WHERE
-	t2.match_player_id = t1.id
-	AND t2.is_deleted = 0
-) AS goal_sum
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team1_id}'
-AND NOT t1.status = 'not_available'
-ORDER BY t1.status ASC,  t1.display_order ASC, t1.name ASC
-EOF;
-
-	$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-	$players_team1 = array();
-	$players_team1_first11 = array();
-	$players_team1_substitute = array();
-
-	while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-		$players_team1[] = $row_player;
-
-		if ($row_player['status'] == 'first_eleven') {
-			$players_team1_first11[] = $row_player;
-		} else {
-			$players_team1_substitute[] = $row_player;
-		}
-	}
-
-	//team 2 players
-	$sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-(
-	SELECT
-	SUM(t3.point)
-	FROM rugby_match_scores t2
-	INNER JOIN rugby_score_types t3 ON t2.rugby_score_type_id = t3.id
-	WHERE
-	t2.match_player_id = t1.id
-	AND t2.is_deleted = 0
-) AS goal_sum
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team2_id}'
-AND NOT t1.status = 'not_available'
-ORDER BY t1.status ASC,  t1.display_order ASC, t1.name ASC
-EOF;
-
-	$Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-	$players_team2 = array();
-	$players_team2_first11 = array();
-	$players_team2_substitute = array();
-
-	while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-		$players_team2[] = $row_player;
-
-		if ($row_player['status'] == 'first_eleven') {
-			$players_team2_first11[] = $row_player;
-		} else {
-			$players_team2_substitute[] = $row_player;
-		}
-	}
-}
-//rugby team players - end
-
-
 
 
 $_SESSION['csrf_d'] = md5(uniqid());
@@ -1067,94 +827,7 @@ if ($script_match_type == 'soccer') {
 }
 // SOCCER MATCH GOAL INSERT FORM - END
 
-// RUGBY MATCH SCORE INSERT FORM - BEGIN
-if ($script_match_type == 'rugby') {
-	?>
-	<form action="" method="post" enctype="multipart/form-data" role="form" onsubmit="return insertRugbyScore(this);">
-		<table class="table" style="background-color: #E2F3E9;">
-			<tr>
-				<td><?php echo $label_array[126]; ?></td>
-			</tr>
-			<tr>
-			<tr>
-				<td>
-					<div class="form-group">
-						<label><?php echo $label_array[36]; ?></label>
-						<select name="match_player_id" class="form-control">
-							<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
-								?></option>
-							<?php foreach ($players_team1 as $player) {
-								?>
-								<option value="<?php echo $player['id']; ?>"><?php echo htmlspecialchars
-									($player['name']);
-									?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="form-group">
-						<label><?php echo $label_array[128]; ?></label>
-						<select name="rugby_score_type_id" class="form-control">
-							<option value="" disabled="disabled" selected="selected"><?php echo $label_array[129];
-								?></option>
-							<?php foreach ($rugby_score_types as $key => $score_type) {
-								?>
-								<option value="<?php echo $key; ?>"><?php echo htmlspecialchars(
-									(isset($label_array[130][$score_type['type']]) ?
-										$label_array[130][$score_type['type']] : $score_type['type']));
-									?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="form-group">
-						<label><?php echo $label_array[40]; ?></label>
-						<input type="text" name="minute" class="form-control" style="width:160px;"/>
-					</div>
 
-					<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
-					<input type="hidden" name="insert_score" value="1">
-					<input type="submit" name="Submit" value="<?php echo $label_array[127]; ?>"/>
-				</td>
-			</tr>
-		</table>
-	</form>
-	<table class="table table-bordered">
-		<tr class="info">
-			<td colspan="3"><?php echo $label_array[126]; ?></td>
-		</tr>
-		<tr>
-			<th><?php echo $label_array[36]; ?></th>
-			<th><?php echo $label_array[40]; ?></th>
-			<th><?php echo $label_array[42]; ?></th>
-		</tr>
-		<?php foreach ($rugby_scores_team1 as $score) {
-			?>
-			<tr>
-				<td align="left"><?php echo htmlspecialchars($score['name']); ?></td>
-				<td align="left">
-					<?php
-					echo htmlspecialchars(
-						$score['score_minute'] . ' (' . (isset($label_array[130][$score['type']]) ?
-								$label_array[130][$score['type']] : $score['type']) . ')'
-					);
-					?>
-				</td>
-				<td align="left">
-					<form id="d_mg_<?php echo $score['id']; ?>" action="<?php echo
-						'delete_rugby_match_score.php?id=' . $score['id'] . '&amp;d=' . $id; ?>"
-						  method="post" role="form">
-						<input type="hidden" name="csrf_d" value="<?php echo $_SESSION['csrf_d']; ?>"/>
-					</form>
-					<a href="#"
-					   onclick="if (confirm('<?php echo $label_array[44]; ?>')) {
-						   document.getElementById('<?php echo 'd_mg_' . $score['id']; ?>').submit(); } return false;
-						   "><?php echo $label_array[42]; ?></a>
-				</td>
-			</tr>
-		<?php } ?>
-	</table>
-<?php
-}
-// RUGBY MATCH SCORE INSERT FORM - END
 ?>
 <form action="" method="post" enctype="multipart/form-data" role="form" onsubmit="return insertCard(this);">
 	<table class="table" style="background-color: #FCF4BC;">
@@ -1314,8 +987,6 @@ if ($script_match_type == 'rugby') {
 	<tr class="info">
 		<?php if ($script_match_type == 'soccer'){ ?>
 			<td><?php echo $label_array[58]; ?></td>
-		<?php } elseif ($script_match_type == 'rugby'){ ?>
-			<td><?php echo $label_array[131]; ?></td>
 		<?php } ?>
 	</tr>
 	<?php foreach ($players_team1_first11 as $player) {
@@ -1614,94 +1285,7 @@ if ($script_match_type == 'soccer') {
 }
 // SOCCER MATCH GOAL INSERT FORM - END
 
-// RUGBY MATCH SCORE INSERT FORM - BEGIN
-if ($script_match_type == 'rugby') {
-?>
-	<form action="" method="post" enctype="multipart/form-data" role="form" onsubmit="return insertRugbyScore(this);">
-		<table class="table" style="background-color: #E2F3E9;">
-			<tr>
-				<td><?php echo $label_array[126]; ?></td>
-			</tr>
-			<tr>
-			<tr>
-				<td>
-					<div class="form-group">
-						<label><?php echo $label_array[36]; ?></label>
-						<select name="match_player_id" class="form-control">
-							<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
-								?></option>
-							<?php foreach ($players_team2 as $player) {
-								?>
-								<option value="<?php echo $player['id']; ?>"><?php echo htmlspecialchars
-									($player['name']);
-									?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="form-group">
-						<label><?php echo $label_array[128]; ?></label>
-						<select name="rugby_score_type_id" class="form-control">
-							<option value="" disabled="disabled" selected="selected"><?php echo $label_array[129];
-								?></option>
-							<?php foreach ($rugby_score_types as $key => $score_type) {
-								?>
-								<option value="<?php echo $key; ?>"><?php echo htmlspecialchars(
-										(isset($label_array[130][$score_type['type']]) ?
-											$label_array[130][$score_type['type']] : $score_type['type']));
-									?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="form-group">
-						<label><?php echo $label_array[40]; ?></label>
-						<input type="text" name="minute" class="form-control" style="width:160px;"/>
-					</div>
 
-					<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
-					<input type="hidden" name="insert_score" value="1">
-					<input type="submit" name="Submit" value="<?php echo $label_array[127]; ?>"/>
-				</td>
-			</tr>
-		</table>
-	</form>
-	<table class="table table-bordered">
-		<tr class="info">
-			<td colspan="3"><?php echo $label_array[126]; ?></td>
-		</tr>
-		<tr>
-			<th><?php echo $label_array[36]; ?></th>
-			<th><?php echo $label_array[40]; ?></th>
-			<th><?php echo $label_array[42]; ?></th>
-		</tr>
-		<?php foreach ($rugby_scores_team2 as $score) {
-			?>
-			<tr>
-				<td align="left"><?php echo htmlspecialchars($score['name']); ?></td>
-				<td align="left">
-					<?php
-					echo htmlspecialchars(
-						$score['score_minute'] . ' (' . (isset($label_array[130][$score['type']]) ?
-							$label_array[130][$score['type']] : $score['type']) . ')'
-					);
-					?>
-				</td>
-				<td align="left">
-					<form id="d_mg_<?php echo $score['id']; ?>" action="<?php echo
-						'delete_rugby_match_score.php?id=' . $score['id'] . '&amp;d=' . $id; ?>"
-						  method="post" role="form">
-						<input type="hidden" name="csrf_d" value="<?php echo $_SESSION['csrf_d']; ?>"/>
-					</form>
-					<a href="#"
-					   onclick="if (confirm('<?php echo $label_array[44]; ?>')) {
-						   document.getElementById('<?php echo 'd_mg_' . $score['id']; ?>').submit(); } return false;
-						   "><?php echo $label_array[42]; ?></a>
-				</td>
-			</tr>
-		<?php } ?>
-	</table>
-<?php
-}
-// RUGBY MATCH SCORE INSERT FORM - END
 ?>
 
 <form action="" method="post" enctype="multipart/form-data" role="form" onsubmit="return insertCard(this);">
@@ -1863,9 +1447,7 @@ if ($script_match_type == 'rugby') {
 	<tr class="info">
 		<?php if ($script_match_type == 'soccer'){ ?>
 			<td><?php echo $label_array[58]; ?></td>
-		<?php } elseif ($script_match_type == 'rugby'){ ?>
-			<td><?php echo $label_array[131]; ?></td>
-		<?php } ?>
+		<?php }  ?>
 	</tr>
 	<?php foreach ($players_team2_first11 as $player) {
 		?>
