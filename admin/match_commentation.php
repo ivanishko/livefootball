@@ -234,59 +234,7 @@ EOF;
 }
 //insert comment - end
 
-//save rugby score record - begin
-if ($script_match_type == 'rugby'){
 
-	if (isset($_POST['insert_score'])
-		&& isset($_POST['minute'])
-		&& isset($_POST['match_player_id'])
-		&& isset($_POST['rugby_score_type_id'])
-		&& trim($_POST['minute']) != ''
-		&& intval($_POST['match_player_id']) > 0
-		&& intval($_POST['rugby_score_type_id']) > 0
-		&& isset($_POST['csrf_i'])
-		&& isset($_SESSION['csrf_i'])
-		&& $_POST['csrf_i'] == $_SESSION['csrf_i']
-	) {
-		$match_player_id = intval($_POST['match_player_id']);
-		$rugby_score_type_id = intval($_POST['rugby_score_type_id']);
-		$minute          = prepare_for_db($_POST['minute']);
-
-		$insert_time = time();
-
-		$sql = <<<EOF
-INSERT INTO rugby_match_scores(
-match_player_id,
-score_minute,
-rugby_score_type_id,
-insert_time
-)
-VALUES(
-'{$match_player_id}',
-'{$minute}',
-'{$rugby_score_type_id}',
-'{$insert_time}'
-)
-EOF;
-
-		mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-		$sql = <<<EOF
-UPDATE matches
-SET
-match_revision_nr = match_revision_nr + 1
-WHERE
-id = $id
-EOF;
-
-		mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-		header("Location: match_commentation.php?id=" . $id);
-		exit();
-	}
-
-}
-//save rugby score record - end
 
 //save goal record - begin
 if ($script_match_type == 'soccer'){
@@ -591,40 +539,6 @@ EOF;
 }
 //match goals - end
 
-//rugby match scores - begin
-if ($script_match_type == 'rugby'){
-	$sql = <<<EOF
-SELECT
-t1.id,
-t1.score_minute,
-t2.name,
-t2.squad_number,
-t2.team_id,
-t3.type,
-t3.point
-FROM rugby_match_scores t1
-INNER JOIN match_players t2 ON t1.match_player_id = t2.id
-INNER JOIN rugby_score_types t3 ON t1.rugby_score_type_id = t3.id
-WHERE
-t2.match_id = '{$id}'
-AND t1.is_deleted = 0
-ORDER BY t1.insert_time DESC
-EOF;
-
-	$Recordset_Scores = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-	$rugby_scores_team1 = array();
-	$rugby_scores_team2 = array();
-
-	while ($row_score = mysqli_fetch_assoc($Recordset_Scores)) {
-		if ($row_score['team_id'] == $team1_id) {
-			$rugby_scores_team1[] = $row_score;
-		} else {
-			$rugby_scores_team2[] = $row_score;
-		}
-	}
-}
-//rugby match scores - end
 
 //match cards - begin
 $sql = <<<EOF
@@ -1065,94 +979,7 @@ if ($script_match_type == 'soccer') {
 }
 // SOCCER MATCH GOAL INSERT FORM - END
 
-// RUGBY MATCH SCORE INSERT FORM - BEGIN
-if ($script_match_type == 'rugby') {
-	?>
-	<form action="" method="post" enctype="multipart/form-data" role="form" onsubmit="return insertRugbyScore(this);">
-		<table class="table" style="background-color: #E2F3E9;">
-			<tr>
-				<td><?php echo $label_array[126]; ?></td>
-			</tr>
-			<tr>
-			<tr>
-				<td>
-					<div class="form-group">
-						<label><?php echo $label_array[36]; ?></label>
-						<select name="match_player_id" class="form-control">
-							<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
-								?></option>
-							<?php foreach ($players_team1 as $player) {
-								?>
-								<option value="<?php echo $player['id']; ?>"><?php echo htmlspecialchars
-									($player['name']);
-									?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="form-group">
-						<label><?php echo $label_array[128]; ?></label>
-						<select name="rugby_score_type_id" class="form-control">
-							<option value="" disabled="disabled" selected="selected"><?php echo $label_array[129];
-								?></option>
-							<?php foreach ($rugby_score_types as $key => $score_type) {
-								?>
-								<option value="<?php echo $key; ?>"><?php echo htmlspecialchars(
-									(isset($label_array[130][$score_type['type']]) ?
-										$label_array[130][$score_type['type']] : $score_type['type']));
-									?></option>
-							<?php } ?>
-						</select>
-					</div>
-					<div class="form-group">
-						<label><?php echo $label_array[40]; ?></label>
-						<input type="text" name="minute" class="form-control" style="width:160px;"/>
-					</div>
 
-					<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
-					<input type="hidden" name="insert_score" value="1">
-					<input type="submit" name="Submit" value="<?php echo $label_array[127]; ?>"/>
-				</td>
-			</tr>
-		</table>
-	</form>
-	<table class="table table-bordered">
-		<tr class="info">
-			<td colspan="3"><?php echo $label_array[126]; ?></td>
-		</tr>
-		<tr>
-			<th><?php echo $label_array[36]; ?></th>
-			<th><?php echo $label_array[40]; ?></th>
-			<th><?php echo $label_array[42]; ?></th>
-		</tr>
-		<?php foreach ($rugby_scores_team1 as $score) {
-			?>
-			<tr>
-				<td align="left"><?php echo htmlspecialchars($score['name']); ?></td>
-				<td align="left">
-					<?php
-					echo htmlspecialchars(
-						$score['score_minute'] . ' (' . (isset($label_array[130][$score['type']]) ?
-								$label_array[130][$score['type']] : $score['type']) . ')'
-					);
-					?>
-				</td>
-				<td align="left">
-					<form id="d_mg_<?php echo $score['id']; ?>" action="<?php echo
-						'delete_rugby_match_score.php?id=' . $score['id'] . '&amp;d=' . $id; ?>"
-						  method="post" role="form">
-						<input type="hidden" name="csrf_d" value="<?php echo $_SESSION['csrf_d']; ?>"/>
-					</form>
-					<a href="#"
-					   onclick="if (confirm('<?php echo $label_array[44]; ?>')) {
-						   document.getElementById('<?php echo 'd_mg_' . $score['id']; ?>').submit(); } return false;
-						   "><?php echo $label_array[42]; ?></a>
-				</td>
-			</tr>
-		<?php } ?>
-	</table>
-<?php
-}
-// RUGBY MATCH SCORE INSERT FORM - END
 ?>
 <form action="" method="post" enctype="multipart/form-data" role="form" onsubmit="return insertCard(this);">
 	<table class="table" style="background-color: #FCF4BC;">
@@ -1403,7 +1230,7 @@ if ($script_match_type == 'rugby') {
 	<?php } ?>
 	<table class="table table-bordered table-striped" style="margin-top: 15px;">
 		<tr>
-			<td align="left" colspan="2" style="background-color: #FFF;">
+			<td align="left" colspan="4" style="background-color: #FFF;">
 				<form action="" method="post" enctype="multipart/form-data" role="form">
 					<table class="table">
 						<tr>
@@ -1475,6 +1302,8 @@ if ($script_match_type == 'rugby') {
 			</td>
 		</tr>
 		<tr class="info">
+            <th></th>
+            <th>Minute</th>
 			<th><?php echo $label_array[76]; ?></th>
 			<th><?php echo $label_array[79]; ?></th>
 		</tr>
@@ -1505,11 +1334,16 @@ if ($script_match_type == 'rugby') {
 			}
 			?>
 			<tr>
-				<td align="left" <?php if ($is_different_color) {
+                <td class="id"><?php echo $comment['id']; ?></td>
+                <td class="minute" contenteditable>
+                    <?php
+                    echo htmlspecialchars(
+                    ($comment['comment_minute'] == "" ? "" : $comment['comment_minute'])); ?>
+                </td>
+				<td class="text" align="left" contenteditable <?php if ($is_different_color) {
 					?> style="color:<?php echo $color; ?>; background-color:<?php echo $bg_color; ?>;"<?php } ?>>
 					<?php
 					echo htmlspecialchars(
-						($comment['comment_minute'] == "" ? "" : $comment['comment_minute'] . ' - ') .
 						nl2br($comment['comment'])
 					);
 					?>
@@ -1521,12 +1355,18 @@ if ($script_match_type == 'rugby') {
 						  method="post" role="form">
 						<input type="hidden" name="csrf_d" value="<?php echo $_SESSION['csrf_d']; ?>"/>
 					</form>
-					<a href="#"
+                    <a href="#" class="js-update-comment">Update</a>
+                    <a href="#"
 					   onclick="if (confirm('<?php echo $label_array[44]; ?>')) { document.getElementById('<?php echo
 						   'd_c_' .
 						   $comment['id'];
 					   ?>').submit(); } return false;"><?php echo $label_array[42]; ?></a>
+
+
+
+
 				</td>
+
 			</tr>
 		<?php } ?>
 	</table>
@@ -1907,5 +1747,34 @@ if ($script_match_type == 'rugby') {
 </table>
 </div>
 </div>
+
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+<script>
+    $(function(){
+        $('.js-update-comment').click(function (e) {
+            e.preventDefault();
+            var parent = $(this).closest('tr'),
+                id = parseInt(parent.find('.id').html()),
+                minute = parent.find('.minute').html(),
+                text = parent.find('.text').html();
+            console.log(id, text);
+
+            $.ajax({
+                url: 'update_match_comment.php',
+                type: 'POST',
+                data: {id: id, minute: minute, text: text},
+                success: function(res){
+                    console.log(res);
+                },
+                error: function(){
+                    alert('Error!');
+                }
+            });
+
+
+        });
+    });
+</script>
 </body>
 </html>
