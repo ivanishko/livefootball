@@ -88,74 +88,7 @@ EOF;
 			exit();
 		}
 	}
-	elseif ($script_match_type == 'rugby'){
-		$sql = <<<EOF
-SELECT
-t1.id,
-t1.status,
-t1.last_start_time,
-t1.team1_id,
-t1.team2_id,
-t2.name AS home_team,
-t3.name AS away_team,
-(
-	SELECT
-	IFNULL(SUM(t6.point), 0)
-	FROM rugby_match_scores t4
-	INNER JOIN rugby_score_types t6 ON t4.rugby_score_type_id = t6.id
-	INNER JOIN match_players t5 ON t4.match_player_id = t5.id
-	WHERE
-	t5.team_id = t2.id
-	AND t5.match_id = t1.id
-	AND t4.is_deleted = 0
-) AS home_goal_sum,
-(
-	SELECT
-	IFNULL(SUM(t6.point), 0)
-	FROM rugby_match_scores t4
-	INNER JOIN rugby_score_types t6 ON t4.rugby_score_type_id = t6.id
-	INNER JOIN match_players t5 ON t4.match_player_id = t5.id
-	WHERE
-	t5.team_id = t3.id
-	AND t5.match_id = t1.id
-	AND t4.is_deleted = 0
-) AS away_goal_sum
-FROM matches t1
-LEFT JOIN teams t2 ON t1.team1_id = t2.id
-LEFT JOIN teams t3 ON t1.team2_id = t3.id
-WHERE
-t1.id='{$id}'
-AND t1.is_deleted = 0
-EOF;
 
-		$Recordset_MatchDetails = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-		$row_match_details = mysqli_fetch_assoc($Recordset_MatchDetails);
-
-		if (mysqli_num_rows($Recordset_MatchDetails) == 0) {
-			header("Location: matches.php");
-			exit();
-		}
-
-		// create rugby score types array
-		$sql = <<<EOF
-SELECT
-t1.id,
-t1.type,
-t1.point
-FROM rugby_score_types t1
-WHERE
-t1.is_deleted = 0
-ORDER BY display_order ASC
-EOF;
-
-		$Recordset_ScoreTypes = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-		$rugby_score_types = array();
-		while ($row_score_type = mysqli_fetch_assoc($Recordset_ScoreTypes)) {
-			$rugby_score_types[$row_score_type['id']] = $row_score_type;
-		}
-
-	}
 } else {
 	header("Location: matches.php");
 	exit();
