@@ -437,7 +437,57 @@ EOF;
 
 	mysqli_query($conn, $sql) or die(mysqli_error($conn));
 
-	header("Location: match_commentation.php?id=" . $id);
+	//вставляем коммент статуса матча! НАЧАЛО
+    switch ($status) {
+        case 'first_half':
+            $minute = '1';
+            $comment_type = 'first_half';
+            $comment = $label_array[108];
+            break;
+        case 'half_time':
+            $minute = '45+';
+            $comment_type = 'half_time';
+            $comment = $label_array[109];
+            break;
+        case 'second_half':
+            $minute = '46';
+            $comment_type = 'first_half';
+            $comment = $label_array[110];
+            break;
+
+        case 'finished':
+            $minute = '90+';
+            $comment_type = 'finished';
+            $comment = $label_array[111];
+            break;
+
+    }
+    $insert_time = time();
+
+    if (in_array($status, array('first_half', 'second_half', 'half_time','finished'))){
+
+    $sql = <<<EOF
+INSERT INTO commentation(
+match_id,
+comment_minute,
+comment,
+comment_type,
+insert_time
+)
+VALUES(
+'{$id}',
+'{$minute}',
+'{$comment}',
+'{$comment_type}',
+'{$insert_time}'
+)
+EOF;
+}
+    mysqli_query($conn, $sql) or die(mysqli_error($conn));
+    
+    //вставляем коммент статуса матча! КОНЕЦ
+
+    header("Location: match_commentation.php?id=" . $id);
 	exit();
 }
 //update match status - end
