@@ -91,69 +91,7 @@ EOF;
         }
 
     }
-    /*elseif ($script_match_type == 'rugby') {
-        $sql = <<<EOF
-SELECT
-t1.id,
-t1.status,
-t1.last_start_time,
-t1.team1_id,
-t1.team2_id,
-t1.title,
-t1.match_date,
-t1.stadium,
-t1.referee_head,
-t1.referee_assistant,
-t1.referee_assistant2,
-t1.referee_fourth,
-t1.match_revision_nr,
-t1.comment_revision_nr,
-t2.name AS home_team,
-t3.name AS away_team,
-t2.logo AS home_team_logo,
-t3.logo AS away_team_logo,
-t2.manager AS home_team_manager,
-t3.manager AS away_team_manager,
-(
-    SELECT
-    IFNULL(SUM(t6.point), 0)
-    FROM rugby_match_scores t4
-    INNER JOIN rugby_score_types t6 ON t4.rugby_score_type_id = t6.id
-    INNER JOIN match_players t5 ON t4.match_player_id = t5.id
-    WHERE
-    t5.team_id = t2.id
-    AND t5.match_id = t1.id
-    AND t4.is_deleted = 0
-) AS home_goal_sum,
-(
-    SELECT
-    IFNULL(SUM(t6.point), 0)
-    FROM rugby_match_scores t4
-    INNER JOIN rugby_score_types t6 ON t4.rugby_score_type_id = t6.id
-    INNER JOIN match_players t5 ON t4.match_player_id = t5.id
-    WHERE
-    t5.team_id = t3.id
-    AND t5.match_id = t1.id
-    AND t4.is_deleted = 0
-) AS away_goal_sum
-FROM matches t1
-LEFT JOIN teams t2 ON t1.team1_id = t2.id
-LEFT JOIN teams t3 ON t1.team2_id = t3.id
-WHERE
-t1.id='{$id}'
-AND t1.is_deleted = 0
-EOF;
 
-        $Recordset_MatchDetails = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-        $row_match_details = mysqli_fetch_assoc($Recordset_MatchDetails);
-
-        if (mysqli_num_rows($Recordset_MatchDetails) == 0) {
-            header("Location: index.php");
-            exit();
-        }
-    }
-
-*/
 } else {
     header("Location: index.php");
     exit();
@@ -933,7 +871,7 @@ switch ($row_match_details['status']) {
                             }
                         }
                     }
-             
+
                     //match goals - end
                     
                     //cards
