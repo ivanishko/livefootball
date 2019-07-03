@@ -221,42 +221,7 @@ EOF;
 }
 //match goals - end
 
-//rugby match scores - begin
-/*if ($script_match_type == 'rugby'){
-    $sql = <<<EOF
-SELECT
-t1.id,
-t1.score_minute,
-t1.insert_time,
-t2.name,
-t2.squad_number,
-t2.team_id,
-t2.id AS player_id,
-t3.type,
-t3.point
-FROM rugby_match_scores t1
-INNER JOIN match_players t2 ON t1.match_player_id = t2.id
-INNER JOIN rugby_score_types t3 ON t1.rugby_score_type_id = t3.id
-WHERE
-t2.match_id = '{$id}'
-AND t1.is_deleted = 0
-ORDER BY t1.insert_time DESC
-EOF;
 
-    $Recordset_Scores = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-    $rugby_scores_team1 = array();
-    $rugby_scores_team2 = array();
-
-    while ($row_score = mysqli_fetch_assoc($Recordset_Scores)) {
-        if ($row_score['team_id'] == $team1_id) {
-            $rugby_scores_team1[] = $row_score;
-        } else {
-            $rugby_scores_team2[] = $row_score;
-        }
-    }
-}*/
-//rugby match scores - end
 
 //match cards - begin
 $sql = <<<EOF
@@ -410,90 +375,8 @@ EOF;
 }
 //soccer team players - end
 
-//rugby team players - begin
-/*if ($script_match_type == 'rugby'){
-    //team 1 players
-    $sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-(
-    SELECT
-    SUM(t3.point)
-    FROM rugby_match_scores t2
-    INNER JOIN rugby_score_types t3 ON t2.rugby_score_type_id = t3.id
-    WHERE
-    t2.match_player_id = t1.id
-    AND t2.is_deleted = 0
-) AS goal_sum
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team1_id}'
-AND NOT t1.status = 'not_available'
-ORDER BY t1.status ASC,  t1.display_order ASC, t1.name ASC
-EOF;
 
-    $Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
 
-    $players_team1 = array();
-    $players_team1_first11 = array();
-    $players_team1_substitute = array();
-
-    while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-        $players_team1[] = $row_player;
-
-        if ($row_player['status'] == 'first_eleven') {
-            $players_team1_first11[] = $row_player;
-        } else {
-            $players_team1_substitute[] = $row_player;
-        }
-    }
-
-    //team 2 players
-    $sql = <<<EOF
-SELECT
-t1.id,
-t1.name,
-t1.squad_number,
-t1.status,
-(
-    SELECT
-    SUM(t3.point)
-    FROM rugby_match_scores t2
-    INNER JOIN rugby_score_types t3 ON t2.rugby_score_type_id = t3.id
-    WHERE
-    t2.match_player_id = t1.id
-    AND t2.is_deleted = 0
-) AS goal_sum
-FROM match_players t1
-WHERE
-t1.match_id='{$id}'
-AND t1.team_id = '{$team2_id}'
-AND NOT t1.status = 'not_available'
-ORDER BY t1.status ASC,  t1.display_order ASC, t1.name ASC
-EOF;
-
-    $Recordset_Players = mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-    $players_team2 = array();
-    $players_team2_first11 = array();
-    $players_team2_substitute = array();
-
-    while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
-        $players_team2[] = $row_player;
-
-        if ($row_player['status'] == 'first_eleven') {
-            $players_team2_first11[] = $row_player;
-        } else {
-            $players_team2_substitute[] = $row_player;
-        }
-    }
-}
-//rugby team players - end
-*/
 
 $match_status_text = '';
 
@@ -604,10 +487,7 @@ switch ($row_match_details['status']) {
     <img src="<?php echo htmlspecialchars($row_match_details['home_team_logo']); ?>" height="130" width="130"/>
     <br/>
     <!-- здесь был главный тренер домашников -->
-    <!-- здесь был главный тренер домашников -->
-    <!-- здесь был главный тренер домашников -->
-    <!-- здесь был главный тренер домашников -->
-    <!-- здесь был главный тренер домашников -->
+
 
 
     <br/><br/>
@@ -651,23 +531,7 @@ switch ($row_match_details['status']) {
                             }
                         }
                     }
-                    /* elseif ($script_match_type == 'rugby'){
-                        foreach ($rugby_scores_team1 as $score) {
-                            if ($score['player_id'] == $player['id']) {
-                                ob_start();
-                                ?>
-                                <img src="img/rugby_ball.png" id="p_g_<?php echo $score['id']; ?>"
-                                     data-toggle="tooltip"
-                                     title="<?php echo str_replace(array('%1'), array($score['score_minute']),
-                                             $label_array[116]) . htmlspecialchars(
-                                             ' (' . (isset($label_array[130][$score['type']]) ?
-                                                 $label_array[130][$score['type']] : $score['type']) . ')'
-                                         ); ?>"/>
-                                <?php
-                                $player_timeline[$score['insert_time']] = trim(ob_get_clean());
-                            }
-                        }
-                    } */
+
                     //match goals - end
 
                     //cards
@@ -760,23 +624,7 @@ switch ($row_match_details['status']) {
                             }
                         }
                     }
-                   /* elseif ($script_match_type == 'rugby'){
-                        foreach ($rugby_scores_team1 as $score) {
-                            if ($score['player_id'] == $player['id']) {
-                                ob_start();
-                                ?>
-                                <img src="img/rugby_ball.png" id="p_g_<?php echo $score['id']; ?>"
-                                     data-toggle="tooltip"
-                                     title="<?php echo str_replace(array('%1'), array($score['score_minute']),
-                                             $label_array[116]) . htmlspecialchars(
-                                             ' (' . (isset($label_array[130][$score['type']]) ?
-                                                 $label_array[130][$score['type']] : $score['type']) . ')'
-                                         ); ?>"/>
-                                <?php
-                                $player_timeline[$score['insert_time']] = trim(ob_get_clean());
-                            }
-                        }
-                    }*/
+
                     //match goals - end
 
                     //cards
@@ -942,44 +790,7 @@ switch ($row_match_details['status']) {
         <?php
         }
     }
-    /*elseif ($script_match_type == 'rugby'){
-        if (count($rugby_scores_team1) > 0 || count($rugby_scores_team2) > 0) {
-            $rugby_score_timeline1 = array();
-            $rugby_score_timeline2 = array();
 
-            foreach ($rugby_scores_team1 as $score) {
-                $rugby_score_timeline1[$score['insert_time']] = $score['score_minute'] . '\' ' . $score['name'] .
-                    htmlspecialchars(
-                        ' (' . (isset($label_array[130][$score['type']]) ?
-                            $label_array[130][$score['type']] : $score['type']) . ')');
-            }
-
-            foreach ($rugby_scores_team2 as $score) {
-                $rugby_score_timeline2[$score['insert_time']] = $score['score_minute'] . '\' ' . $score['name'] .
-                    htmlspecialchars(
-                        ' (' . (isset($label_array[130][$score['type']]) ?
-                            $label_array[130][$score['type']] : $score['type']) . ')');
-            }
-            ?>
-            <table class="table table-bordered">
-                <tr>
-                    <td align="left" class="col-sm-6">
-                        <?php
-                        echo implode('<br>', $rugby_score_timeline1);
-                        ?>
-                    </td>
-                    <td align="right" class="col-sm-6">
-                        <?php
-                        echo implode('<br>', $rugby_score_timeline2);
-                        ?>
-                    </td>
-                </tr>
-            </table>
-        <?php
-        }
-    }
-    //score table - end
-    */
     ?>
 
 <span id="commentary" style="height: 780px; display: block; overflow:scroll; overflow-x:hidden;">
@@ -1034,25 +845,7 @@ switch ($row_match_details['status']) {
                             }
                         }
                     }
-                    /*
-                    elseif ($script_match_type == 'rugby'){
-                        foreach ($rugby_scores_team2 as $score) {
-                            if ($score['player_id'] == $player['id']) {
-                                ob_start();
-                                ?>
-                                <img src="img/rugby_ball.png" id="p_g_<?php echo $score['id']; ?>"
-                                     data-toggle="tooltip"
-                                     title="<?php echo str_replace(array('%1'), array($score['score_minute']),
-                                             $label_array[116]) . htmlspecialchars(
-                                             ' (' . (isset($label_array[130][$score['type']]) ?
-                                                 $label_array[130][$score['type']] : $score['type']) . ')'
-                                         ); ?>"/>
-                                <?php
-                                $player_timeline[$score['insert_time']] = trim(ob_get_clean());
-                            }
-                        }
-                    }
-                    */
+
                     //match goals - end
 
                     //cards
@@ -1140,25 +933,7 @@ switch ($row_match_details['status']) {
                             }
                         }
                     }
-                    /*
-                    elseif ($script_match_type == 'rugby'){
-                        foreach ($rugby_scores_team2 as $score) {
-                            if ($score['player_id'] == $player['id']) {
-                                ob_start();
-                                ?>
-                                <img src="img/rugby_ball.png" id="p_g_<?php echo $score['id']; ?>"
-                                     data-toggle="tooltip"
-                                     title="<?php echo str_replace(array('%1'), array($score['score_minute']),
-                                             $label_array[116]) . htmlspecialchars(
-                                             ' (' . (isset($label_array[130][$score['type']]) ?
-                                                 $label_array[130][$score['type']] : $score['type']) . ')'
-                                         ); ?>"/>
-                                <?php
-                                $player_timeline[$score['insert_time']] = trim(ob_get_clean());
-                            }
-                        }
-                    }
-                    */
+             
                     //match goals - end
                     
                     //cards
