@@ -83,6 +83,10 @@ EOF;
 		$Recordset_MatchDetails = mysqli_query($conn, $sql) or die(mysqli_error($conn));
 		$row_match_details = mysqli_fetch_assoc($Recordset_MatchDetails);
 
+		echo '<pre>';
+		 var_dump($row_match_details);
+        echo '</pre>';
+
 		if (mysqli_num_rows($Recordset_MatchDetails) == 0) {
 			header("Location: matches.php");
 			exit();
@@ -210,6 +214,39 @@ EOF;
 
 		mysqli_query($conn, $sql) or die(mysqli_error($conn));
 
+        switch ($_POST["team_goal"]) {
+            case 'team_home':
+                $team_goal = $row_match_details["home_team"];
+                break;
+            case 'team_away':
+                $team_goal = $row_match_details["away_team"];
+                break;
+
+        }
+
+		$comment = 'ГОЛ! Забивает №' . $_POST["player_goal"]. ' за команду "'. $team_goal. '"' ;
+		$comment_type = 'goal';
+
+            $sql = <<<EOF
+INSERT INTO commentation(
+match_id,
+comment_minute,
+comment,
+comment_type,
+insert_time
+)
+VALUES(
+'{$id}',
+'{$minute}',
+'{$comment}',
+'{$comment_type}',
+'{$insert_time}'
+)
+EOF;
+
+        mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+
 		$sql = <<<EOF
 	UPDATE matches
 	SET
@@ -219,6 +256,16 @@ EOF;
 EOF;
 
 		mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+
+
+
+
+
+
+
+
+
 
 		header("Location: match_commentation.php?id=" . $id);
 		exit();
@@ -891,7 +938,7 @@ if ($script_match_type == 'soccer') {
 			<td>
 				<div class="form-group">
 					<label><?php echo $label_array[36]; ?></label>
-					<select name="match_player_id" class="form-control">
+					<select name="match_player_id" class="form-control player_goal_home">
 						<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
 							?></option>
 						<?php foreach ($players_team1 as $player) {
@@ -916,7 +963,10 @@ if ($script_match_type == 'soccer') {
 					<input type="text" name="minute" class="form-control" style="width:160px;"/>
 				</div>
 				<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
-				<input type="hidden" name="insert_goal" value="1">
+				<input type="hidden" name="insert_goal" value="1"/>
+				<input type="hidden" name="team_goal" value="team_home"/>
+                <input type="hidden" name="player_goal" class="player_goal" value='' />
+
 				<input type="submit" name="Submit" value="<?php echo $label_array[41]; ?>"/>
 			</td>
 		</tr>
@@ -1395,6 +1445,7 @@ if ($script_match_type == 'soccer') {
 				</div>
 				<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
 				<input type="hidden" name="insert_goal" value="1">
+                <input type="hidden" name="team_goal" value="team_away">
 				<input type="submit" name="Submit" value="<?php echo $label_array[41]; ?>"/>
 			</td>
 		</tr>
@@ -1671,6 +1722,20 @@ if ($script_match_type == 'soccer') {
 
         });
     });
+
+</script>
+
+<script>
+
+    $(function(){
+        $('.player_goal_home').change(function () {
+            //var player_name = $('.player_goal_home option[selected="selected"]').val();
+            var player_name = $(".player_goal_home option:selected").text();
+            console.log(player_name);
+            $('.player_goal').attr("value" ,player_name);
+        });
+    });
+
 </script>
 </body>
 </html>
