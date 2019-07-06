@@ -223,9 +223,20 @@ EOF;
                 break;
 
         }
+         if ($is_penalty_goal) {
+             $comment = 'ГОЛ! C 11-метровой отметки забивает №' . $_POST["player_goal"]. ' за команду "'. $team_goal. '"' ;
+             $comment_type = 'goal';
+         }
+        elseif ($is_own_goal) {
+            $comment = 'ГОЛ! Мяч в свои ворота забивает №' . $_POST["player_goal"]. '("'. $team_goal. '")' ;
+            $comment_type = 'goal';
+        }
+        else {
+            $comment = 'ГОЛ! Забивает №' . $_POST["player_goal"]. ' за команду "'. $team_goal. '"' ;
+            $comment_type = 'goal';
+        }
 
-		$comment = 'ГОЛ! Забивает №' . $_POST["player_goal"]. ' за команду "'. $team_goal. '"' ;
-		$comment_type = 'goal';
+
 
             $sql = <<<EOF
 INSERT INTO commentation(
@@ -256,17 +267,6 @@ EOF;
 EOF;
 
 		mysqli_query($conn, $sql) or die(mysqli_error($conn));
-
-
-
-
-
-
-
-
-
-
-
 		header("Location: match_commentation.php?id=" . $id);
 		exit();
 	}
@@ -304,6 +304,66 @@ VALUES(
 EOF;
 
 	mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+	//вставка желтых карточек в комментарии НАЧАЛО
+
+    switch ($_POST["team_card"]) {
+        case 'home_team':
+            $team_card = $row_match_details["home_team"];
+            break;
+        case 'away_team':
+            $team_card = $row_match_details["away_team"];
+            break;
+    }
+
+    $minute = $card_minute;
+
+    switch ($_POST["card_type"]) {
+          case 'yellow':
+              $comment = $label_array[73]. ' Получает футболист №' . $_POST["card_player"]. ' ("'. $team_card .'")';
+              $comment_type = 'yellow';
+              break;
+          case 'red':
+              $comment = $label_array[74]. ' С поля уходит №'.$_POST["card_player"]. ' ("'. $team_card .'")';
+              $comment_type = 'red';
+              break;
+          case 'second_yellow':
+              $comment = 'Второе предупреждение получает футболист №'.$_POST["card_player"]. ' ("'. $team_card .'")';
+              $comment_type = 'second_yellow';
+              break;
+      }
+
+    $sql = <<<EOF
+INSERT INTO commentation(
+        match_id,
+        comment_minute,
+        comment,
+        comment_type,
+        insert_time
+    )
+VALUES(
+    '{$id}',
+    '{$minute}',
+    '{$comment}',
+    '{$comment_type}',
+    '{$insert_time}'
+)
+EOF;
+
+        mysqli_query($conn, $sql) or die(mysqli_error($conn));
+
+
+
+    //вставка желтых карточек в комментарии КОНЕЦ
+
+
+
+
+
+
+
+
+
 
 	$sql = <<<EOF
 UPDATE matches
@@ -464,7 +524,7 @@ VALUES(
 EOF;
 }
     mysqli_query($conn, $sql) or die(mysqli_error($conn));
-    
+
     //вставляем коммент статуса матча! КОНЕЦ
 
     header("Location: match_commentation.php?id=" . $id);
@@ -965,7 +1025,7 @@ if ($script_match_type == 'soccer') {
 				<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
 				<input type="hidden" name="insert_goal" value="1"/>
 				<input type="hidden" name="team_goal" value="team_home"/>
-                <input type="hidden" name="player_goal" class="player_goal" value='' />
+                <input type="hidden" name="player_goal" class="player_goal_home_value" value='' />
 
 				<input type="submit" name="Submit" value="<?php echo $label_array[41]; ?>"/>
 			</td>
@@ -1024,7 +1084,7 @@ if ($script_match_type == 'soccer') {
 			<td>
 				<div class="form-group">
 					<label><?php echo $label_array[36]; ?></label>
-					<select name="match_player_id" class="form-control">
+					<select name="match_player_id" class="form-control  card_player_home">
 						<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
 							?></option>
 						<?php foreach ($players_team1 as $player) {
@@ -1050,6 +1110,8 @@ if ($script_match_type == 'soccer') {
 				</div>
 				<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
 				<input type="hidden" name="insert_card" value="1">
+                <input type="hidden" name="team_card" value="home_team"/>
+                <input type="hidden" name="card_player" class="card_player_home_value" value=""/>
 				<input type="submit" name="Submit" value="<?php echo $label_array[50]; ?>"/>
 			</td>
 		</tr>
@@ -1306,10 +1368,6 @@ if ($script_match_type == 'soccer') {
 									<select name="comment_type" class="form-control">
 										<option value="standard" selected="selected"><?php echo $label_array[71];
 											?></option>
-										<option value="goal"><?php echo $label_array[72]; ?></option>
-										<option value="yellow"><?php echo $label_array[73]; ?></option>
-										<option value="red"><?php echo $label_array[74]; ?></option>
-										<option value="substitution"><?php echo $label_array[75]; ?></option>
 									</select>
 								</div>
 							</td>
@@ -1419,7 +1477,7 @@ if ($script_match_type == 'soccer') {
 			<td>
 				<div class="form-group">
 					<label><?php echo $label_array[36]; ?></label>
-					<select name="match_player_id" class="form-control">
+					<select name="match_player_id" class="form-control player_goal_away">
 						<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
 							?></option>
 						<?php foreach ($players_team2 as $player) {
@@ -1447,7 +1505,9 @@ if ($script_match_type == 'soccer') {
 				<input type="hidden" name="insert_goal" value="1">
                 <input type="hidden" name="team_goal" value="team_away">
 				<input type="submit" name="Submit" value="<?php echo $label_array[41]; ?>"/>
-			</td>
+                <input type="hidden" name="player_goal" class="player_goal_away_value" value='' />
+
+            </td>
 		</tr>
 	</table>
 </form>
@@ -1504,7 +1564,7 @@ if ($script_match_type == 'soccer') {
 			<td>
 				<div class="form-group">
 					<label><?php echo $label_array[36]; ?></label>
-					<select name="match_player_id" class="form-control">
+					<select name="match_player_id" class="form-control  card_player_away">
 						<option value="" disabled="disabled" selected="selected"><?php echo $label_array[37];
 							?></option>
 						<?php foreach ($players_team2 as $player) {
@@ -1531,6 +1591,8 @@ if ($script_match_type == 'soccer') {
 				<input type="hidden" name="csrf_i" value="<?php echo $_SESSION['csrf_i']; ?>"/>
 				<input type="hidden" name="insert_card" value="1">
 				<input type="submit" name="Submit" value="<?php echo $label_array[50]; ?>"/>
+                <input type="hidden" name="team_card" value="away_team"/>
+                <input type="hidden" name="card_player" class="card_player_away_value" value=""/>
 			</td>
 		</tr>
 	</table>
@@ -1729,13 +1791,45 @@ if ($script_match_type == 'soccer') {
 
     $(function(){
         $('.player_goal_home').change(function () {
-            //var player_name = $('.player_goal_home option[selected="selected"]').val();
             var player_name = $(".player_goal_home option:selected").text();
             console.log(player_name);
-            $('.player_goal').attr("value" ,player_name);
+            $('.player_goal_home_value').attr("value", player_name);
         });
     });
 
+    $(function(){
+        $('.player_goal_away').change(function () {
+            var player_name_away = $(".player_goal_away option:selected").text();
+            console.log(player_name_away);
+            $('.player_goal_away_value').attr("value", player_name_away);
+        });
+    });
+
+    $(function(){
+        $('.card_player_home').change(function () {
+            var player_card_name_home = $(".card_player_home option:selected").text();
+            console.log(player_card_name_home);
+            $('.card_player_home_value').attr("value", player_card_name_home);
+        });
+    });
+
+    $(function(){
+        $('.card_player_away').change(function () {
+            var player_card_name_away = $(".card_player_away option:selected").text();
+            console.log(player_card_name_away);
+            $('.card_player_away_value').attr("value", player_card_name_away);
+        });
+    });
+
+
+
+
+
+
+
 </script>
+
+
+
 </body>
 </html>
