@@ -267,8 +267,11 @@ EOF;
 
         if ($row_player['status'] == 'first_eleven') {
             $players_team1_first11[] = $row_player;
-        } else {
+        } elseif  ($row_player['status'] == 'substitute'){
             $players_team1_substitute[] = $row_player;
+        }
+        else {
+            $players_team1_coach[] = $row_player;
         }
     }
 
@@ -617,9 +620,22 @@ switch ($row_match_details['status']) {
                 </td>
             </tr>
         <?php } ?>
-        
-        <tr><td>    <?php echo 'Гл.тренер ' . htmlspecialchars($row_match_details['home_team_manager']); ?>
-</td></tr>
+
+        <tr class="info">
+            <td></td>
+
+
+        </tr>
+        <?php foreach ($players_team1_coach as $coach) { ?>
+        <tr>
+            <td align="left">
+                <span style="width: 90px; display:inline-block; color:#FF8040;">
+                <?php echo $coach['squad_number']; ?>
+                </span>
+                <?php echo $coach['name']; ?>
+            </td>
+        </tr>
+        <?php } ?>
 
     </table>
 

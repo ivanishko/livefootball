@@ -85,7 +85,7 @@ EOF;
         }
 
         if (preg_match('/status([0-9]*)/', $key, $result)) {
-            if (in_array($value, array('not_available', 'substitute', 'first_eleven'))) {
+            if (in_array($value, array('not_available', 'substitute', 'first_eleven', 'coach'))) {
                 $sql = <<<EOF
 UPDATE match_players
 SET
@@ -194,20 +194,22 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
         <p><strong><?php echo $label_array[81]; ?></strong></p>
         <form action="" method="post">
             <div class="col-lg-6 border"><h3><?php echo htmlspecialchars($row_match_details['home_team']); ?></h3>
-                <div class="input-group mb-3">
-                    <label style="width: 320px;"></label>
-                    <label class="owner-start-label label-list" style="width: 60px; text-align: center">?</label>
-                    <label class="owner-reserve-label label-list" style="width: 60px;text-align: center">?</label>
-                    <label class="owner-notav-label label-list" style="width: 60px;text-align: center">?</label>
-                    <label style="width: 200px;">Name</label>
-                    <label style="width: 60px;text-align: center">Number</label>
-                    <label style="width: 60px;text-align: center">Order</label>
-                    <label style="width: 60px;text-align: center">Start</label>
-                    <label style="width: 60px;text-align: center">Reserve</label>
-                    <label style="width: 60px;text-align: center">not</label>
+                <div class="input-group mb-4">
+                    <label style="width: 340px;"></label>
+                    <label class="owner-start-label label-list" style="width: 50px; text-align: center">?</label>
+                    <label class="owner-reserve-label label-list" style="width: 50px;text-align: center">?</label>
+                    <label class="owner-notav-label label-list" style="width: 50px;text-align: center">?</label>
+                    <label class="owner-coach-label label-list" style="width: 50px;text-align: center">?</label>
+                    <label style="width: 190px;">Name</label>
+                    <label style="width: 100px;text-align: center">Num</label>
+                    <label style="width: 50px;text-align: center">Ord</label>
+                    <label style="width: 50px;text-align: center">Start</label>
+                    <label style="width: 50px;text-align: center">Res</label>
+                    <label style="width: 50px;text-align: center">not</label>
+                    <label style="width: 50px;text-align: center">coach</label>
                 </div>
                 <?php foreach ($players_team1 as $player) {?>
-                    <div class="input-group mb-3">
+                    <div class="input-group mb-4">
                         <input class="form-control form-control-sm" type="text"   name="name<?php echo $player['id']; ?>"
                                value="<?php echo htmlspecialchars($player['name']); ?>"
                                style="width:200px;" aria-describedby="basic-addon1"/>
@@ -216,11 +218,11 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                         <input class="form-control form-control-sm" type="text" name="squad_number<?php echo $player['id']; ?>"
                                value="<?php echo htmlspecialchars
                                ($player['squad_number']); ?>"
-                               style="width:60px;"/>
+                               style="width:100px;"/>
                         <input class="form-control form-control-sm" type="text" name="display_order<?php echo $player['id']; ?>"
                                value="<?php echo htmlspecialchars
                                ($player['display_order']); ?>"
-                               style="width:60px;"/>
+                               style="width:50px;"/>
 
                         <input onchange="countCheck();"
                                class="owner-start" type="radio"
@@ -229,7 +231,7 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                             <?php if ($player['status'] == 'first_eleven') {
                                 echo ' checked';
                             }
-                            ?> style="width:60px;">
+                            ?> style="width:50px;">
 
                         <input onchange="countCheck();"
                                class="owner-reserve"  type="radio"
@@ -238,7 +240,7 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                             <?php if ($player['status'] == 'substitute') {
                                 echo ' checked';
                             }
-                            ?> style="width:60px;">
+                            ?> style="width:50px;">
                         <input onchange="countCheck();"
                                class="owner-not-available"  type="radio"
                                name="status<?php echo $player['id']; ?>"
@@ -246,7 +248,15 @@ while ($row_player = mysqli_fetch_assoc($Recordset_Players)) {
                             <?php if ($player['status'] == 'not_available') {
                                 echo ' checked';
                             }
-                            ?> style="width:60px;" >
+                            ?> style="width:40px;" >
+                        <input onchange="countCheck();"
+                               class="coach"  type="radio"
+                               name="status<?php echo $player['id']; ?>"
+                               value="coach"
+                            <?php if ($player['status'] == 'coach') {
+                                echo ' checked';
+                            }
+                            ?> style="width:40px;" >
 
                     </div>
                 <?php } ?>
