@@ -334,6 +334,12 @@ switch ($row_match_details['status']) {
     case 'finished':
         $match_status_text = $label_array[111]; //End of Match
         break;
+    case 'first_dop_time':
+        $match_status_text = $label_array[144]; //End of Match
+        break;
+    case 'second_dop_time':
+        $match_status_text = $label_array[145]; //End of Match
+        break;
 }
 
 $start_time = 1;

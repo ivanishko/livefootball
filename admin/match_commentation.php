@@ -448,6 +448,8 @@ if (isset($_POST['update_status'])
 			'first_half',
 			'second_half',
 			'half_time',
+			'first_dop_time',
+			'second_dop_time',
 			'finished'
 		)
 	)
@@ -457,7 +459,7 @@ if (isset($_POST['update_status'])
 
 	$last_start_time = 0;
 
-	if (in_array($status, array('temp', 'first_half', 'second_half', 'half_time'))
+	if (in_array($status, array('temp', 'first_half', 'second_half', 'half_time','first_dop_time','second_dop_time'))
 		&& $row_match_details['status'] != $status
 	) {
 		$last_start_time = time();
@@ -1294,6 +1296,12 @@ if ($script_match_type == 'soccer') {
 				<option value="finished" <?php if ($row_match_details['status'] == 'finished') {
 					?> selected="selected"<?php } ?>><?php echo $label_array[66]; ?>
 				</option>
+                <option value="first_dop_time" <?php if ($row_match_details['status'] == 'first_dop_time') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[144]; ?>
+                </option>
+                <option value="second_dop_time" <?php if ($row_match_details['status'] == 'second_dop_time') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[145]; ?>
+                </option>
 			</select>
 		</div>
 		<input type="hidden" name="csrf_e" value="<?php echo $_SESSION['csrf_e']; ?>"/>

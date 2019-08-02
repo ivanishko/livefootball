@@ -145,3 +145,5 @@ $label_array[135] = 'Manual'; //Manual
 $label_array[141] = ' Второе предупреждение! '; //Manual
 $label_array[142] = ' получает футболист №'; //Manual
 $label_array[143] = ' С поля уходит '; //Manual
+$label_array[144] = ' 1 доп.тайм '; //Manual
+$label_array[145] = ' 2 доп.тайм '; //Manual
