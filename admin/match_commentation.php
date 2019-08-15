@@ -1296,12 +1296,31 @@ if ($script_match_type == 'soccer') {
 				<option value="finished" <?php if ($row_match_details['status'] == 'finished') {
 					?> selected="selected"<?php } ?>><?php echo $label_array[66]; ?>
 				</option>
-                <option value="first_dop_time" <?php if ($row_match_details['status'] == 'first_dop_time') {
+                <option value="finish_time" <?php if ($row_match_details['status'] == 'finish_time') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[151]; ?>
+                </option>
+                <option value="first_overtime" <?php if ($row_match_details['status'] == 'first_overtime') {
                     ?> selected="selected"<?php } ?>><?php echo $label_array[144]; ?>
                 </option>
-                <option value="second_dop_time" <?php if ($row_match_details['status'] == 'second_dop_time') {
+                <option value="half_overtime" <?php if ($row_match_details['status'] == 'half_overtime') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[150]; ?>
+                </option>
+                <option value="second_overtime" <?php if ($row_match_details['status'] == 'second_overtime') {
                     ?> selected="selected"<?php } ?>><?php echo $label_array[145]; ?>
                 </option>
+                <option value="finish_overtime" <?php if ($row_match_details['status'] == 'finish_overtime') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[66]; ?>
+                </option>
+                <option value="penalty_series" <?php if ($row_match_details['status'] == 'penalty_series') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[152]; ?>
+                </option>
+                <option value="fin_pen_1win" <?php if ($row_match_details['status'] == 'fin_pen_1win') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[148]; ?>
+                </option>
+                <option value="fin_pen_2win" <?php if ($row_match_details['status'] == 'fin_pen_2win') {
+                    ?> selected="selected"<?php } ?>><?php echo $label_array[149]; ?>
+                </option>
+
 			</select>
 		</div>
 		<input type="hidden" name="csrf_e" value="<?php echo $_SESSION['csrf_e']; ?>"/>

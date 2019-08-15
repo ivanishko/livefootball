@@ -315,9 +315,9 @@ EOF;
     }
 }
 //soccer team players - end
-
-
-
+echo'<pre>';
+var_dump($row_match_details);
+echo '</pre>';
 
 $match_status_text = '';
 
@@ -334,12 +334,28 @@ switch ($row_match_details['status']) {
     case 'finished':
         $match_status_text = $label_array[111]; //End of Match
         break;
-    case 'first_dop_time':
-        $match_status_text = $label_array[144]; //End of Match
+    case 'finish_time':
+        $match_status_text = $label_array[151]; //End of Match
         break;
-    case 'second_dop_time':
-        $match_status_text = $label_array[145]; //End of Match
+    case 'first_overtime':
+        $match_status_text = $label_array[144];
         break;
+    case 'second_overtime':
+        $match_status_text = $label_array[145];
+        break;
+    case 'fin_over_1win':
+        $match_status_text = $label_array[146];
+        break;
+    case 'fin_over_2win':
+        $match_status_text = $label_array[147];
+        break;
+    case 'fin_pen_1win':
+        $match_status_text = $label_array[148];
+        break;
+    case 'fin_pen_2win':
+        $match_status_text = $label_array[149];
+        break;
+
 }
 
 $start_time = 1;
@@ -677,7 +693,7 @@ switch ($row_match_details['status']) {
             <td align="center"
                 style="font-size:42px;">
                 <?php if ($row_match_details['status'] == 'not_started') {echo ' ' ;} else  {echo '<b>' . htmlspecialchars(
-                        $row_match_details['home_goal_sum'] 
+                        $row_match_details['home_goal_sum']
                     ) . '</b>';}  ?>
             </td>
             <td align="center">

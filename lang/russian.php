@@ -147,3 +147,11 @@ $label_array[142] = ' получает футболист №'; //Manual
 $label_array[143] = ' С поля уходит '; //Manual
 $label_array[144] = ' 1 доп.тайм '; //Manual
 $label_array[145] = ' 2 доп.тайм '; //Manual
+$label_array[146] = ' после овертайма '; //Manual
+$label_array[147] = ' после овертайма '; //Manual
+$label_array[148] = ' после серии пенальти победа 1'; //Manual
+$label_array[149] = ' после серии пенальти победа 2 '; //Manual
+$label_array[150] = ' перерыв после д.в.'; //Manual
+$label_array[151] = ' перерыв между осн.в.'; //Manual
+$label_array[152] = ' Серия пенальти'; //Manual
+
