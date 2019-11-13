@@ -1453,12 +1453,12 @@ if ($script_match_type == 'soccer') {
 			?>
 			<tr>
                 <td class="id"><?php echo $comment['id']; ?></td>
-                <td class="minute" contenteditable>
+                <td id="min<?php echo $comment['id']; ?>" class="minute" contenteditable>
                     <?php
                     echo htmlspecialchars(
                     ($comment['comment_minute'] == "" ? "" : $comment['comment_minute'])); ?>
                 </td>
-				<td class="text" align="left" contenteditable <?php if ($is_different_color) {
+				<td id="com<?php echo $comment['id']; ?>" class="text" align="left" contenteditable <?php if ($is_different_color) {
 					?> style="color:<?php echo $color; ?>; background-color:<?php echo $bg_color; ?>;"<?php } ?>>
 					<?php
 					echo htmlspecialchars(
@@ -1479,6 +1479,7 @@ if ($script_match_type == 'soccer') {
 						   'd_c_' .
 						   $comment['id'];
 					   ?>').submit(); } return false;"><?php echo $label_array[42]; ?></a>
+				    <button href="#"  onClick="copyCb(<?php echo $comment['id']; ?>)">Copy</button>
 
 
 
@@ -1854,6 +1855,32 @@ if ($script_match_type == 'soccer') {
 
 
 
+</script>
+<script>
+    function copyCb(id) {
+
+        const ta = document.getElementById('com'+id);
+        const min = document.getElementById('min'+id);
+        console.log('attatata',ta);
+        const textComment =  ta.innerText;
+        const minComment =  min.innerText;
+        console.log('textComment',textComment);
+        console.log('minComment',minComment);
+
+        const copytext = document.createElement('input');
+        if (typeof textComment=='undefined') {
+            copyText.value=window.location.href;
+            }
+        else {
+            copyText.value=minComment+'` ' + textComment
+        };
+        document.body.appendChild(copyText );
+        copyText.select();
+        document.execCommand('copy');
+        document.body.removeChild(copyText);
+
+
+    };
 </script>
 
 
