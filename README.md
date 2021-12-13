@@ -1,3 +1,4 @@
 # livefootball
+Upgraded system fo football live-tranlation 
 
-Система ведения он-лайн протоколов футбольных матчей и текстовых трансляций 
+Players, substitutions, yellow car, red card, scores etc.
